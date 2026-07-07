@@ -1,6 +1,8 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 
+const TIME_LIMIT_SECONDS = 5
+
 const kanaCards = [
   { kana: 'あ', readingKo: '아', romaji: 'a' },
   { kana: 'い', readingKo: '이', romaji: 'i' },
@@ -215,13 +217,18 @@ const level = ref(1)
 const currentCard = ref(null)
 const isAnswerVisible = ref(false)
 const isAnswered = ref(false)
+const isStarted = ref(false)
+const isTimedMode = ref(true)
+const remainingSeconds = ref(TIME_LIMIT_SECONDS)
+const timerId = ref(null)
+const currentView = ref('trainer')
 const reviewMode = ref(false)
 const message = ref('')
 const todayCount = ref(0)
 const correctCount = ref(0)
 const wrongCount = ref(0)
-const streakCount = ref(0)
 const wrongCards = ref([])
+const cardStats = ref({})
 
 const activeCards = computed(() => {
   if (reviewMode.value) {
@@ -238,8 +245,87 @@ const cardText = computed(() => {
 
 const levelLabel = computed(() => (level.value === 1 ? '히라가나 음 카드' : '일본어 단어 카드'))
 
+const recordCards = computed(() => (level.value === 1 ? kanaCards : wordCards))
+
+const cardStatRows = computed(() => {
+  return recordCards.value
+    .map((card) => {
+      const stats = cardStats.value[getStatKey(card)] || { correct: 0, wrong: 0 }
+      const total = stats.correct + stats.wrong
+
+      return {
+        text: getCardKey(card),
+        readingKo: card.readingKo,
+        meaningKo: card.meaningKo,
+        correct: stats.correct,
+        wrong: stats.wrong,
+        total,
+        accuracy: total === 0 ? null : Math.round((stats.correct / total) * 100),
+      }
+    })
+    .filter((row) => row.total > 0)
+    .sort((a, b) => a.accuracy - b.accuracy || b.total - a.total || a.text.localeCompare(b.text, 'ja'))
+})
+
 function getCardKey(card) {
   return card.kana || card.word
+}
+
+function getStatKey(card) {
+  return card.kana ? `kana:${card.kana}` : `word:${card.word}`
+}
+
+function recordCardResult(card, result) {
+  const key = getStatKey(card)
+  const currentStats = cardStats.value[key] || { correct: 0, wrong: 0 }
+
+  cardStats.value[key] = {
+    ...currentStats,
+    [result]: currentStats[result] + 1,
+  }
+}
+
+function clearTimer() {
+  if (!timerId.value) return
+
+  clearInterval(timerId.value)
+  timerId.value = null
+}
+
+function countWrong(card, timeoutMessage) {
+  todayCount.value += 1
+  wrongCount.value += 1
+  recordCardResult(card, 'wrong')
+  isAnswered.value = true
+
+  if (!wrongCards.value.some((wrongCard) => getCardKey(wrongCard) === getCardKey(card))) {
+    wrongCards.value.push(card)
+  }
+
+  message.value = timeoutMessage || '틀린 카드에 저장했습니다'
+}
+
+function handleTimeUp() {
+  if (isAnswered.value || isAnswerVisible.value || !currentCard.value) return
+
+  clearTimer()
+  isAnswerVisible.value = true
+  countWrong(currentCard.value, '시간 초과로 오답 처리했습니다')
+}
+
+function startTimer() {
+  clearTimer()
+  remainingSeconds.value = TIME_LIMIT_SECONDS
+
+  if (!isTimedMode.value) return
+
+  timerId.value = setInterval(() => {
+    remainingSeconds.value -= 1
+
+    if (remainingSeconds.value <= 0) {
+      handleTimeUp()
+    }
+  }, 1000)
 }
 
 // 현재 카드와 바로 같은 카드가 다시 나오지 않도록 랜덤 카드를 고른다.
@@ -257,8 +343,15 @@ function pickRandomCard(cards) {
 }
 
 function showAnswer() {
+  clearTimer()
   isAnswerVisible.value = true
   message.value = ''
+}
+
+function startTraining() {
+  reviewMode.value = false
+  isStarted.value = true
+  nextCard()
 }
 
 function nextCard() {
@@ -267,39 +360,36 @@ function nextCard() {
   if (reviewMode.value && cards.length === 0) {
     message.value = '틀린 카드가 없습니다'
     reviewMode.value = false
-    currentCard.value = pickRandomCard(activeCards.value)
+    isStarted.value = false
+    currentCard.value = null
+    clearTimer()
     return
   }
 
   currentCard.value = pickRandomCard(cards)
   isAnswerVisible.value = false
   isAnswered.value = false
+  remainingSeconds.value = TIME_LIMIT_SECONDS
   message.value = reviewMode.value ? '틀린 카드 복습 중입니다' : ''
+  startTimer()
 }
 
 function markCorrect() {
-  if (isAnswered.value) return
+  if (isAnswered.value || !currentCard.value) return
 
+  clearTimer()
   todayCount.value += 1
   correctCount.value += 1
-  streakCount.value += 1
+  recordCardResult(currentCard.value, 'correct')
   isAnswered.value = true
   message.value = '맞음으로 기록했습니다'
 }
 
 function markWrong() {
-  if (isAnswered.value) return
+  if (isAnswered.value || !currentCard.value) return
 
-  todayCount.value += 1
-  wrongCount.value += 1
-  streakCount.value = 0
-  isAnswered.value = true
-
-  if (!wrongCards.value.some((card) => getCardKey(card) === getCardKey(currentCard.value))) {
-    wrongCards.value.push(currentCard.value)
-  }
-
-  message.value = '틀린 카드에 저장했습니다'
+  clearTimer()
+  countWrong(currentCard.value)
 }
 
 function startWrongReview() {
@@ -309,6 +399,7 @@ function startWrongReview() {
   }
 
   reviewMode.value = true
+  isStarted.value = true
   nextCard()
 }
 
@@ -316,12 +407,27 @@ function changeLevel(nextLevel) {
   level.value = nextLevel
 }
 
+function changeMode(nextTimedMode) {
+  isTimedMode.value = nextTimedMode
+  reviewMode.value = false
+  isStarted.value = false
+  currentCard.value = null
+  isAnswerVisible.value = false
+  isAnswered.value = false
+  remainingSeconds.value = TIME_LIMIT_SECONDS
+  message.value = ''
+  clearTimer()
+}
+
 watch(level, () => {
   reviewMode.value = false
-  nextCard()
+  isStarted.value = false
+  currentCard.value = null
+  isAnswerVisible.value = false
+  isAnswered.value = false
+  remainingSeconds.value = TIME_LIMIT_SECONDS
+  clearTimer()
 })
-
-nextCard()
 </script>
 
 <template>
@@ -332,58 +438,139 @@ nextCard()
         <h1>히라가나 반응속도 훈련</h1>
       </header>
 
-      <div class="level-tabs" aria-label="난이도 선택">
-        <button :class="{ active: level === 1 }" type="button" @click="changeLevel(1)">
+      <div class="view-tabs" aria-label="화면 선택">
+        <button :class="{ active: currentView === 'trainer' }" type="button" @click="currentView = 'trainer'">
+          훈련
+        </button>
+        <button :class="{ active: currentView === 'stats' }" type="button" @click="currentView = 'stats'">
+          기록
+        </button>
+      </div>
+
+      <template v-if="currentView === 'trainer'">
+        <div class="level-tabs" aria-label="난이도 선택">
+          <button :class="{ active: level === 1 }" type="button" @click="changeLevel(1)">
           난이도 1
-        </button>
-        <button :class="{ active: level === 2 }" type="button" @click="changeLevel(2)">
+          </button>
+          <button :class="{ active: level === 2 }" type="button" @click="changeLevel(2)">
           난이도 2
-        </button>
-      </div>
-
-      <p class="level-label">{{ levelLabel }}</p>
-
-      <article class="card">
-        <p class="review-badge" v-if="reviewMode">틀린 카드 복습</p>
-        <div class="prompt">{{ cardText }}</div>
-
-        <div class="answer" v-if="isAnswerVisible && currentCard">
-          <p><span>발음</span>{{ currentCard.readingKo }}</p>
-          <p><span>로마자</span>{{ currentCard.romaji }}</p>
-          <p v-if="currentCard.meaningKo"><span>뜻</span>{{ currentCard.meaningKo }}</p>
+          </button>
         </div>
 
-        <p class="message" v-if="message">{{ message }}</p>
-      </article>
+        <div class="mode-tabs" aria-label="훈련 모드 선택">
+          <button :class="{ active: isTimedMode }" type="button" @click="changeMode(true)">
+            시간 제한 모드
+          </button>
+          <button :class="{ active: !isTimedMode }" type="button" @click="changeMode(false)">
+            일반 모드
+          </button>
+        </div>
 
-      <div class="actions">
-        <button v-if="!isAnswerVisible" type="button" @click="showAnswer">확인</button>
-        <template v-else-if="!isAnswered">
-          <button type="button" @click="markCorrect">맞음</button>
-          <button type="button" @click="markWrong">틀림</button>
-        </template>
-        <button v-else type="button" @click="nextCard">다음</button>
-        <button class="wide" type="button" @click="startWrongReview">틀린 카드 복습</button>
-      </div>
+        <p class="level-label">{{ levelLabel }}</p>
 
-      <dl class="stats">
-        <div>
-          <dt>오늘 푼 개수</dt>
-          <dd>{{ todayCount }}</dd>
+        <article class="card">
+          <template v-if="!isStarted">
+            <p class="ready-title">준비되면 시작하세요</p>
+            <p class="ready-copy">
+              {{
+                isTimedMode
+                  ? '시작 후 각 문제는 5초 안에 확인해야 합니다'
+                  : '시간 제한 없이 천천히 확인할 수 있습니다'
+              }}
+            </p>
+          </template>
+
+          <template v-else>
+            <p class="review-badge" v-if="reviewMode">틀린 카드 복습</p>
+            <p
+              class="timer"
+              v-if="isTimedMode"
+              :class="{ danger: remainingSeconds <= 2 && !isAnswerVisible }"
+            >
+              {{ remainingSeconds }}초
+            </p>
+            <div class="prompt">{{ cardText }}</div>
+          </template>
+
+          <div class="answer" v-if="isAnswerVisible && currentCard">
+            <p><span>발음</span>{{ currentCard.readingKo }}</p>
+            <p><span>로마자</span>{{ currentCard.romaji }}</p>
+            <p v-if="currentCard.meaningKo"><span>뜻</span>{{ currentCard.meaningKo }}</p>
+          </div>
+
+          <p class="message" v-if="message">{{ message }}</p>
+        </article>
+
+        <div class="actions">
+          <button v-if="!isStarted" type="button" @click="startTraining">시작</button>
+          <button v-else-if="!isAnswerVisible" type="button" @click="showAnswer">확인</button>
+          <template v-else-if="!isAnswered">
+            <button type="button" @click="markCorrect">맞음</button>
+            <button type="button" @click="markWrong">틀림</button>
+          </template>
+          <button v-else type="button" @click="nextCard">다음</button>
+          <button class="wide" type="button" @click="startWrongReview">틀린 카드 복습</button>
         </div>
-        <div>
-          <dt>맞은 개수</dt>
-          <dd>{{ correctCount }}</dd>
-        </div>
-        <div>
-          <dt>틀린 개수</dt>
-          <dd>{{ wrongCount }}</dd>
-        </div>
-        <div>
-          <dt>연속 정답</dt>
-          <dd>{{ streakCount }}</dd>
-        </div>
-      </dl>
+
+        <dl class="stats">
+          <div>
+            <dt>오늘 푼 개수</dt>
+            <dd>{{ todayCount }}</dd>
+          </div>
+          <div>
+            <dt>맞은 개수</dt>
+            <dd>{{ correctCount }}</dd>
+          </div>
+          <div>
+            <dt>틀린 개수</dt>
+            <dd>{{ wrongCount }}</dd>
+          </div>
+        </dl>
+      </template>
+
+      <section v-else class="record-panel">
+        <dl class="stats record-stats">
+          <div>
+            <dt>현재까지 푼 문제</dt>
+            <dd>{{ todayCount }}</dd>
+          </div>
+          <div>
+            <dt>정답 개수</dt>
+            <dd>{{ correctCount }}</dd>
+          </div>
+          <div>
+            <dt>오답 개수</dt>
+            <dd>{{ wrongCount }}</dd>
+          </div>
+        </dl>
+
+        <article class="record-card">
+          <header class="record-header">
+            <div>
+              <p class="level-label">난이도 {{ level }}</p>
+              <h2>{{ level === 1 ? '음절별 정답률' : '단어별 정답률' }}</h2>
+            </div>
+          </header>
+
+          <p class="empty-record" v-if="cardStatRows.length === 0">
+            아직 기록된 카드가 없습니다
+          </p>
+
+          <div class="record-list" v-else>
+            <div class="record-row" v-for="row in cardStatRows" :key="row.text">
+              <div class="record-name">
+                <strong>{{ row.text }}</strong>
+                <span>{{ row.readingKo }}<template v-if="row.meaningKo"> · {{ row.meaningKo }}</template></span>
+              </div>
+              <div class="record-counts">
+                <span>정답 {{ row.correct }}</span>
+                <span>오답 {{ row.wrong }}</span>
+              </div>
+              <strong class="record-rate">{{ row.accuracy }}%</strong>
+            </div>
+          </div>
+        </article>
+      </section>
     </section>
   </main>
 </template>
@@ -455,19 +642,33 @@ h1 {
   letter-spacing: 0;
 }
 
+.view-tabs,
+.mode-tabs,
 .level-tabs {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
+}
+
+.view-tabs,
+.mode-tabs {
   margin-bottom: 10px;
 }
 
+.level-tabs {
+  margin-bottom: 10px;
+}
+
+.view-tabs button,
+.mode-tabs button,
 .level-tabs button {
   min-height: 44px;
   color: #1d2733;
   background: #dce5e9;
 }
 
+.view-tabs button.active,
+.mode-tabs button.active,
 .level-tabs button.active {
   color: #fff;
   background: #28666e;
@@ -501,6 +702,29 @@ h1 {
   background: #e4f2f1;
   font-size: 0.82rem;
   font-weight: 800;
+}
+
+.ready-title {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 900;
+}
+
+.ready-copy {
+  margin: 12px 0 0;
+  color: #64717f;
+  font-weight: 800;
+}
+
+.timer {
+  margin: 0 0 12px;
+  color: #28666e;
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+
+.timer.danger {
+  color: #b84b32;
 }
 
 .prompt {
@@ -562,7 +786,7 @@ h1 {
 
 .stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
   margin: 14px 0 0;
 }
@@ -587,6 +811,96 @@ h1 {
   font-weight: 900;
 }
 
+.record-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.record-stats {
+  margin-top: 0;
+}
+
+.record-card {
+  padding: 18px;
+  border: 1px solid #d7dee4;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 16px 38px rgb(29 39 51 / 12%);
+}
+
+.record-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.record-header .level-label {
+  margin: 0 0 4px;
+  text-align: left;
+}
+
+.record-header h2 {
+  margin: 0;
+  font-size: 1.35rem;
+  letter-spacing: 0;
+}
+
+.empty-record {
+  margin: 28px 0;
+  color: #64717f;
+  font-weight: 800;
+  text-align: center;
+}
+
+.record-list {
+  display: grid;
+  gap: 8px;
+  max-height: 420px;
+  overflow: auto;
+}
+
+.record-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid #e0e6eb;
+  border-radius: 8px;
+  background: #f8fafb;
+}
+
+.record-name {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.record-name strong {
+  font-size: 1.35rem;
+}
+
+.record-name span,
+.record-counts {
+  color: #64717f;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.record-counts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px 10px;
+}
+
+.record-rate {
+  color: #28666e;
+  font-size: 1.2rem;
+}
+
 @media (max-width: 430px) {
   .app-shell {
     padding: 16px;
@@ -603,6 +917,16 @@ h1 {
 
   .stats {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .record-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .record-counts {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-content: flex-start;
   }
 }
 </style>
