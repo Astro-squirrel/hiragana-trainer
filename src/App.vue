@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 
-const TIME_LIMIT_SECONDS = 5
+const TIME_LIMIT_SECONDS = 3
 
 const kanaCards = [
   { kana: 'あ', readingKo: '아', romaji: 'a' },
@@ -474,7 +474,7 @@ watch(level, () => {
             <p class="ready-copy">
               {{
                 isTimedMode
-                  ? '시작 후 각 문제는 5초 안에 확인해야 합니다'
+                  ? '시작 후 각 문제는 3초 안에 확인해야 합니다'
                   : '시간 제한 없이 천천히 확인할 수 있습니다'
               }}
             </p>
