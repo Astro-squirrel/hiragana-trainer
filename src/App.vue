@@ -458,11 +458,11 @@ watch(level, () => {
         </div>
 
         <div class="mode-tabs" aria-label="훈련 모드 선택">
-          <button :class="{ active: isTimedMode }" type="button" @click="changeMode(true)">
-            시간 제한 모드
-          </button>
           <button :class="{ active: !isTimedMode }" type="button" @click="changeMode(false)">
             일반 모드
+          </button>
+          <button :class="{ active: isTimedMode }" type="button" @click="changeMode(true)">
+            시간 제한 모드
           </button>
         </div>
 
@@ -502,13 +502,13 @@ watch(level, () => {
         </article>
 
         <div class="actions">
-          <button v-if="!isStarted" type="button" @click="startTraining">시작</button>
-          <button v-else-if="!isAnswerVisible" type="button" @click="showAnswer">확인</button>
+          <button class="primary-action" v-if="!isStarted" type="button" @click="startTraining">시작</button>
+          <button class="primary-action" v-else-if="!isAnswerVisible" type="button" @click="showAnswer">확인</button>
           <template v-else-if="!isAnswered">
             <button type="button" @click="markCorrect">맞음</button>
             <button type="button" @click="markWrong">틀림</button>
           </template>
-          <button v-else type="button" @click="nextCard">다음</button>
+          <button class="primary-action" v-else type="button" @click="nextCard">다음</button>
           <button class="wide" type="button" @click="startWrongReview">틀린 카드 복습</button>
         </div>
 
@@ -773,6 +773,12 @@ h1 {
 .actions button {
   min-height: 46px;
   padding: 0 12px;
+}
+
+.actions .primary-action {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: min(100%, 220px);
 }
 
 .actions .wide {
