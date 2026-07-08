@@ -499,7 +499,12 @@ function handleTrainerEnter(event) {
 }
 
 function submitAnswer() {
-  if (isAnswered.value || !currentCard.value) return
+  if (isAnswered.value) {
+    nextCard()
+    return
+  }
+
+  if (!currentCard.value) return
 
   if (!answerInput.value.trim()) {
     message.value = '답을 입력해 주세요'
@@ -645,24 +650,22 @@ onUnmounted(() => {
           <p class="message" v-if="message">{{ message }}</p>
         </article>
 
-        <form class="answer-form" v-if="isStarted && !isAnswered && !isAnswerVisible" @submit.prevent="submitAnswer">
+        <form class="answer-form" v-if="isStarted" @submit.prevent="submitAnswer">
           <input
             ref="answerInputElement"
             v-model="answerInput"
-            :disabled="isAnswered"
             type="text"
             autocomplete="off"
             autocapitalize="off"
             placeholder="한글 발음을 입력하세요. 예: 오토-상"
             aria-label="정답 입력"
           />
-          <button type="submit">전송</button>
+          <button type="submit">{{ isAnswered ? '다음' : '전송' }}</button>
         </form>
 
         <div class="actions">
           <button class="primary-action" v-if="!isStarted" type="button" @click="startTraining">시작</button>
-          <button class="primary-action" v-else-if="isAnswered" type="button" @click="nextCard">다음</button>
-          <button class="primary-action muted-action" v-else type="button" @click="giveUpAndShowAnswer">정답 보기</button>
+          <button class="primary-action muted-action" v-else-if="!isAnswered" type="button" @click="giveUpAndShowAnswer">정답 보기</button>
           <button class="wide" v-if="reviewMode" type="button" @click="returnToTraining">
             일반 훈련으로 돌아가기
           </button>
