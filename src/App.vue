@@ -222,6 +222,7 @@ const recordMetric = ref('accuracy')
 const recordSortDirection = ref('desc')
 const reviewMode = ref(false)
 const message = ref('')
+const resultState = ref('')
 const answerInput = ref('')
 const answerInputElement = ref(null)
 const todayCount = ref(0)
@@ -455,6 +456,7 @@ function countWrong(card, timeoutMessage) {
   recordCardResult(card, 'wrong')
   questionStartedAt.value = null
   isAnswered.value = true
+  resultState.value = 'wrong'
 
   if (!wrongCards.value.some((wrongCard) => getCardKey(wrongCard) === getCardKey(card))) {
     wrongCards.value.push(card)
@@ -508,6 +510,7 @@ function submitAnswer() {
 
   if (!answerInput.value.trim()) {
     message.value = '답을 입력해 주세요'
+    resultState.value = ''
     return
   }
 
@@ -545,6 +548,7 @@ function nextCard() {
   answerInput.value = ''
   questionStartedAt.value = Date.now()
   message.value = reviewMode.value ? '틀린 카드 복습 중입니다' : ''
+  resultState.value = ''
   focusAnswerInput()
 }
 
@@ -556,6 +560,7 @@ function markCorrect(responseMs = getElapsedResponseMs()) {
   recordCardResult(currentCard.value, 'correct', responseMs)
   questionStartedAt.value = null
   isAnswered.value = true
+  resultState.value = 'correct'
   message.value = `정답입니다 · ${formatResponseTime(responseMs)}`
 }
 
@@ -587,6 +592,7 @@ watch(level, () => {
   isAnswerVisible.value = false
   isAnswered.value = false
   answerInput.value = ''
+  resultState.value = ''
   questionStartedAt.value = null
 })
 
@@ -628,7 +634,7 @@ onUnmounted(() => {
 
         <p class="level-label">{{ levelLabel }}</p>
 
-        <article class="card">
+        <article class="card" :class="resultState">
           <template v-if="!isStarted">
             <p class="ready-title">준비되면 시작하세요</p>
             <p class="ready-copy">
@@ -647,7 +653,7 @@ onUnmounted(() => {
             <p v-if="currentCard.meaningKo"><span>뜻</span>{{ currentCard.meaningKo }}</p>
           </div>
 
-          <p class="message" v-if="message">{{ message }}</p>
+          <p class="message" :class="resultState" v-if="message">{{ message }}</p>
         </article>
 
         <form class="answer-form" v-if="isStarted" @submit.prevent="submitAnswer">
@@ -901,6 +907,18 @@ h1 {
   text-align: center;
 }
 
+.card.correct {
+  border-color: #2f8f46;
+  background: #f3fbf5;
+  box-shadow: 0 16px 38px rgb(47 143 70 / 18%);
+}
+
+.card.wrong {
+  border-color: #c24132;
+  background: #fff6f4;
+  box-shadow: 0 16px 38px rgb(194 65 50 / 18%);
+}
+
 .review-badge {
   margin: 0 0 12px;
   padding: 6px 10px;
@@ -955,8 +973,20 @@ h1 {
 .message {
   min-height: 24px;
   margin: 18px 0 0;
+  padding: 8px 12px;
+  border-radius: 8px;
   color: #9b4f21;
   font-weight: 800;
+}
+
+.message.correct {
+  color: #1f6f35;
+  background: #dff4e4;
+}
+
+.message.wrong {
+  color: #a83225;
+  background: #fde1dc;
 }
 
 .answer-form {
