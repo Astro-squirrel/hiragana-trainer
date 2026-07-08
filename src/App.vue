@@ -1,7 +1,5 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
-
-const TIME_LIMIT_SECONDS = 3
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 const kanaCards = [
   { kana: 'あ', readingKo: '아', romaji: 'a' },
@@ -218,12 +216,14 @@ const currentCard = ref(null)
 const isAnswerVisible = ref(false)
 const isAnswered = ref(false)
 const isStarted = ref(false)
-const isTimedMode = ref(false)
-const remainingSeconds = ref(TIME_LIMIT_SECONDS)
-const timerId = ref(null)
+const questionStartedAt = ref(null)
 const currentView = ref('trainer')
+const recordMetric = ref('accuracy')
+const recordSortDirection = ref('desc')
 const reviewMode = ref(false)
 const message = ref('')
+const answerInput = ref('')
+const answerInputElement = ref(null)
 const todayCount = ref(0)
 const correctCount = ref(0)
 const wrongCount = ref(0)
@@ -247,11 +247,19 @@ const levelLabel = computed(() => (level.value === 1 ? '히라가나 음 카드'
 
 const recordCards = computed(() => (level.value === 1 ? kanaCards : wordCards))
 
+const recordSortLabel = computed(() => (recordSortDirection.value === 'desc' ? '내림차순' : '오름차순'))
+
 const cardStatRows = computed(() => {
   return recordCards.value
     .map((card) => {
-      const stats = cardStats.value[getStatKey(card)] || { correct: 0, wrong: 0 }
+      const stats = cardStats.value[getStatKey(card)] || {
+        correct: 0,
+        wrong: 0,
+        totalResponseMs: 0,
+      }
       const total = stats.correct + stats.wrong
+      const averageResponseMs =
+        stats.correct === 0 ? null : Math.round(stats.totalResponseMs / stats.correct)
 
       return {
         text: getCardKey(card),
@@ -261,10 +269,25 @@ const cardStatRows = computed(() => {
         wrong: stats.wrong,
         total,
         accuracy: total === 0 ? null : Math.round((stats.correct / total) * 100),
+        averageResponseMs,
       }
     })
     .filter((row) => row.total > 0)
-    .sort((a, b) => a.accuracy - b.accuracy || b.total - a.total || a.text.localeCompare(b.text, 'ja'))
+    .sort((a, b) => {
+      const direction = recordSortDirection.value === 'desc' ? -1 : 1
+
+      if (recordMetric.value === 'speed') {
+        if (a.averageResponseMs === null) return 1
+        if (b.averageResponseMs === null) return -1
+        return (
+          (a.averageResponseMs - b.averageResponseMs) * direction ||
+          b.total - a.total ||
+          a.text.localeCompare(b.text, 'ja')
+        )
+      }
+
+      return (a.accuracy - b.accuracy) * direction || b.total - a.total || a.text.localeCompare(b.text, 'ja')
+    })
 })
 
 function getCardKey(card) {
@@ -275,27 +298,162 @@ function getStatKey(card) {
   return card.kana ? `kana:${card.kana}` : `word:${card.word}`
 }
 
-function recordCardResult(card, result) {
+function getElapsedResponseMs() {
+  if (!questionStartedAt.value) return 0
+
+  return Date.now() - questionStartedAt.value
+}
+
+function formatResponseTime(milliseconds) {
+  if (milliseconds === null) return '-'
+
+  return `${(milliseconds / 1000).toFixed(2)}초`
+}
+
+function selectRecordMetric(nextMetric) {
+  if (recordMetric.value === nextMetric) {
+    recordSortDirection.value = recordSortDirection.value === 'desc' ? 'asc' : 'desc'
+    return
+  }
+
+  recordMetric.value = nextMetric
+  recordSortDirection.value = 'desc'
+}
+
+function recordCardResult(card, result, responseMs = 0) {
   const key = getStatKey(card)
-  const currentStats = cardStats.value[key] || { correct: 0, wrong: 0 }
+  const currentStats = cardStats.value[key] || {
+    correct: 0,
+    wrong: 0,
+    totalResponseMs: 0,
+  }
 
   cardStats.value[key] = {
     ...currentStats,
     [result]: currentStats[result] + 1,
+    totalResponseMs:
+      result === 'correct' ? currentStats.totalResponseMs + responseMs : currentStats.totalResponseMs,
   }
 }
 
-function clearTimer() {
-  if (!timerId.value) return
+function normalizeAnswer(answer) {
+  return answer
+    .trim()
+    .toLowerCase()
+    .replace(/[－ー―–—]/g, '-')
+    .replace(/\s+/g, '')
+}
 
-  clearInterval(timerId.value)
-  timerId.value = null
+function getLongVowelOptions(syllable) {
+  const code = syllable.charCodeAt(0) - 0xac00
+
+  if (code < 0 || code > 11171) return ['']
+
+  const vowelIndex = Math.floor((code % 588) / 28)
+  const vowelOptions = {
+    0: ['아'],
+    2: ['야'],
+    8: ['우', '오'],
+    12: ['우', '오'],
+    13: ['우'],
+    17: ['우'],
+    18: ['이'],
+    20: ['이', '에'],
+  }
+
+  return vowelOptions[vowelIndex] || ['']
+}
+
+function addLongVowelVariants(answers, answer) {
+  if (!answer.includes('-')) return
+
+  const variants = ['']
+
+  for (let index = 0; index < answer.length; index += 1) {
+    const character = answer[index]
+
+    if (character !== '-') {
+      for (let variantIndex = 0; variantIndex < variants.length; variantIndex += 1) {
+        variants[variantIndex] += character
+      }
+      continue
+    }
+
+    const previousCharacter = answer[index - 1]
+    const options = getLongVowelOptions(previousCharacter)
+    const expandedVariants = []
+
+    variants.forEach((variant) => {
+      options.forEach((option) => expandedVariants.push(`${variant}${option}`))
+    })
+
+    variants.splice(0, variants.length, ...expandedVariants)
+  }
+
+  variants.forEach((variant) => answers.add(variant))
+}
+
+function addReadingVariants(answers, answer) {
+  const variantGroups = [
+    ['챠', '차'],
+    ['츄', '추'],
+    ['쵸', '초'],
+    ['쟈', '자'],
+    ['쥬', '주'],
+    ['죠', '조'],
+    ['샤', '샤'],
+    ['슈', '슈'],
+    ['쇼', '쇼'],
+    ['캬', '캬'],
+    ['큐', '큐'],
+    ['쿄', '쿄'],
+    ['갸', '갸'],
+    ['규', '규'],
+    ['교', '교'],
+  ]
+
+  variantGroups.forEach(([from, to]) => {
+    if (answer.includes(from)) answers.add(answer.replaceAll(from, to))
+    if (answer.includes(to)) answers.add(answer.replaceAll(to, from))
+  })
+
+  if (answer.includes('-')) {
+    answers.add(answer.replaceAll('-', ''))
+    addLongVowelVariants(answers, answer)
+  }
+
+  if (answer.includes('각코')) {
+    answers.add(answer.replace('각코', '갓코'))
+  }
+
+  if (answer.includes('갓코')) {
+    answers.add(answer.replace('갓코', '각코'))
+  }
+}
+
+function getAcceptedAnswers(card) {
+  const answers = new Set([card.readingKo])
+
+  if (card.answersKo) {
+    card.answersKo.forEach((answer) => answers.add(answer))
+  }
+
+  Array.from(answers).forEach((answer) => addReadingVariants(answers, answer))
+
+  return Array.from(answers).map(normalizeAnswer)
+}
+
+function isCorrectAnswer(card, answer) {
+  if (!card || !answer.trim()) return false
+
+  return getAcceptedAnswers(card).includes(normalizeAnswer(answer))
 }
 
 function countWrong(card, timeoutMessage) {
   todayCount.value += 1
   wrongCount.value += 1
   recordCardResult(card, 'wrong')
+  questionStartedAt.value = null
   isAnswered.value = true
 
   if (!wrongCards.value.some((wrongCard) => getCardKey(wrongCard) === getCardKey(card))) {
@@ -303,29 +461,6 @@ function countWrong(card, timeoutMessage) {
   }
 
   message.value = timeoutMessage || '틀린 카드에 저장했습니다'
-}
-
-function handleTimeUp() {
-  if (isAnswered.value || isAnswerVisible.value || !currentCard.value) return
-
-  clearTimer()
-  isAnswerVisible.value = true
-  countWrong(currentCard.value, '시간 초과로 오답 처리했습니다')
-}
-
-function startTimer() {
-  clearTimer()
-  remainingSeconds.value = TIME_LIMIT_SECONDS
-
-  if (!isTimedMode.value) return
-
-  timerId.value = setInterval(() => {
-    remainingSeconds.value -= 1
-
-    if (remainingSeconds.value <= 0) {
-      handleTimeUp()
-    }
-  }, 1000)
 }
 
 // 현재 카드와 바로 같은 카드가 다시 나오지 않도록 랜덤 카드를 고른다.
@@ -342,10 +477,43 @@ function pickRandomCard(cards) {
   return nextCard
 }
 
-function showAnswer() {
-  clearTimer()
+function giveUpAndShowAnswer() {
+  if (isAnswered.value || !currentCard.value) return
+
   isAnswerVisible.value = true
-  message.value = ''
+  countWrong(currentCard.value, `정답은 ${currentCard.value.readingKo}입니다`)
+}
+
+function focusAnswerInput() {
+  nextTick(() => {
+    answerInputElement.value?.focus()
+  })
+}
+
+function handleTrainerEnter(event) {
+  if (event.key !== 'Enter' || event.isComposing) return
+  if (currentView.value !== 'trainer' || !isAnswered.value) return
+
+  event.preventDefault()
+  nextCard()
+}
+
+function submitAnswer() {
+  if (isAnswered.value || !currentCard.value) return
+
+  if (!answerInput.value.trim()) {
+    message.value = '답을 입력해 주세요'
+    return
+  }
+
+  isAnswerVisible.value = true
+
+  if (isCorrectAnswer(currentCard.value, answerInput.value)) {
+    markCorrect(getElapsedResponseMs())
+    return
+  }
+
+  countWrong(currentCard.value, `오답입니다. 정답은 ${currentCard.value.readingKo}입니다`)
 }
 
 function startTraining() {
@@ -362,34 +530,28 @@ function nextCard() {
     reviewMode.value = false
     isStarted.value = false
     currentCard.value = null
-    clearTimer()
+    questionStartedAt.value = null
     return
   }
 
   currentCard.value = pickRandomCard(cards)
   isAnswerVisible.value = false
   isAnswered.value = false
-  remainingSeconds.value = TIME_LIMIT_SECONDS
+  answerInput.value = ''
+  questionStartedAt.value = Date.now()
   message.value = reviewMode.value ? '틀린 카드 복습 중입니다' : ''
-  startTimer()
+  focusAnswerInput()
 }
 
-function markCorrect() {
+function markCorrect(responseMs = getElapsedResponseMs()) {
   if (isAnswered.value || !currentCard.value) return
 
-  clearTimer()
   todayCount.value += 1
   correctCount.value += 1
-  recordCardResult(currentCard.value, 'correct')
+  recordCardResult(currentCard.value, 'correct', responseMs)
+  questionStartedAt.value = null
   isAnswered.value = true
-  message.value = '맞음으로 기록했습니다'
-}
-
-function markWrong() {
-  if (isAnswered.value || !currentCard.value) return
-
-  clearTimer()
-  countWrong(currentCard.value)
+  message.value = `정답입니다 · ${formatResponseTime(responseMs)}`
 }
 
 function startWrongReview() {
@@ -403,20 +565,14 @@ function startWrongReview() {
   nextCard()
 }
 
-function changeLevel(nextLevel) {
-  level.value = nextLevel
+function returnToTraining() {
+  reviewMode.value = false
+  isStarted.value = true
+  nextCard()
 }
 
-function changeMode(nextTimedMode) {
-  isTimedMode.value = nextTimedMode
-  reviewMode.value = false
-  isStarted.value = false
-  currentCard.value = null
-  isAnswerVisible.value = false
-  isAnswered.value = false
-  remainingSeconds.value = TIME_LIMIT_SECONDS
-  message.value = ''
-  clearTimer()
+function changeLevel(nextLevel) {
+  level.value = nextLevel
 }
 
 watch(level, () => {
@@ -425,8 +581,16 @@ watch(level, () => {
   currentCard.value = null
   isAnswerVisible.value = false
   isAnswered.value = false
-  remainingSeconds.value = TIME_LIMIT_SECONDS
-  clearTimer()
+  answerInput.value = ''
+  questionStartedAt.value = null
+})
+
+onMounted(() => {
+  window.addEventListener('keydown', handleTrainerEnter)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleTrainerEnter)
 })
 </script>
 
@@ -457,38 +621,18 @@ watch(level, () => {
           </button>
         </div>
 
-        <div class="mode-tabs" aria-label="훈련 모드 선택">
-          <button :class="{ active: !isTimedMode }" type="button" @click="changeMode(false)">
-            일반 모드
-          </button>
-          <button :class="{ active: isTimedMode }" type="button" @click="changeMode(true)">
-            시간 제한 모드
-          </button>
-        </div>
-
         <p class="level-label">{{ levelLabel }}</p>
 
         <article class="card">
           <template v-if="!isStarted">
             <p class="ready-title">준비되면 시작하세요</p>
             <p class="ready-copy">
-              {{
-                isTimedMode
-                  ? '시작 후 각 문제는 3초 안에 확인해야 합니다'
-                  : '시간 제한 없이 천천히 확인할 수 있습니다'
-              }}
+              답을 제출할 때까지 걸린 시간을 함께 기록합니다
             </p>
           </template>
 
           <template v-else>
             <p class="review-badge" v-if="reviewMode">틀린 카드 복습</p>
-            <p
-              class="timer"
-              v-if="isTimedMode"
-              :class="{ danger: remainingSeconds <= 2 && !isAnswerVisible }"
-            >
-              {{ remainingSeconds }}초
-            </p>
             <div class="prompt">{{ cardText }}</div>
           </template>
 
@@ -501,15 +645,28 @@ watch(level, () => {
           <p class="message" v-if="message">{{ message }}</p>
         </article>
 
+        <form class="answer-form" v-if="isStarted && !isAnswered && !isAnswerVisible" @submit.prevent="submitAnswer">
+          <input
+            ref="answerInputElement"
+            v-model="answerInput"
+            :disabled="isAnswered"
+            type="text"
+            autocomplete="off"
+            autocapitalize="off"
+            placeholder="한글 발음을 입력하세요. 예: 오토-상"
+            aria-label="정답 입력"
+          />
+          <button type="submit">전송</button>
+        </form>
+
         <div class="actions">
           <button class="primary-action" v-if="!isStarted" type="button" @click="startTraining">시작</button>
-          <button class="primary-action" v-else-if="!isAnswerVisible" type="button" @click="showAnswer">확인</button>
-          <template v-else-if="!isAnswered">
-            <button type="button" @click="markCorrect">맞음</button>
-            <button type="button" @click="markWrong">틀림</button>
-          </template>
-          <button class="primary-action" v-else type="button" @click="nextCard">다음</button>
-          <button class="wide" type="button" @click="startWrongReview">틀린 카드 복습</button>
+          <button class="primary-action" v-else-if="isAnswered" type="button" @click="nextCard">다음</button>
+          <button class="primary-action muted-action" v-else type="button" @click="giveUpAndShowAnswer">정답 보기</button>
+          <button class="wide" v-if="reviewMode" type="button" @click="returnToTraining">
+            일반 훈련으로 돌아가기
+          </button>
+          <button class="wide" v-else type="button" @click="startWrongReview">틀린 카드 복습</button>
         </div>
 
         <dl class="stats">
@@ -548,9 +705,38 @@ watch(level, () => {
           <header class="record-header">
             <div>
               <p class="level-label">난이도 {{ level }}</p>
-              <h2>{{ level === 1 ? '음절별 정답률' : '단어별 정답률' }}</h2>
+              <h2>
+                {{
+                  recordMetric === 'accuracy'
+                    ? level === 1
+                      ? '음절별 정답률'
+                      : '단어별 정답률'
+                    : level === 1
+                      ? '음절별 응답속도'
+                      : '단어별 응답속도'
+                }}
+              </h2>
             </div>
           </header>
+
+          <div class="metric-tabs" aria-label="기록 기준 선택">
+            <button
+              :class="{ active: recordMetric === 'accuracy' }"
+              type="button"
+              @click="selectRecordMetric('accuracy')"
+            >
+              정답률
+              <span v-if="recordMetric === 'accuracy'">{{ recordSortLabel }}</span>
+            </button>
+            <button
+              :class="{ active: recordMetric === 'speed' }"
+              type="button"
+              @click="selectRecordMetric('speed')"
+            >
+              응답속도
+              <span v-if="recordMetric === 'speed'">{{ recordSortLabel }}</span>
+            </button>
+          </div>
 
           <p class="empty-record" v-if="cardStatRows.length === 0">
             아직 기록된 카드가 없습니다
@@ -565,8 +751,11 @@ watch(level, () => {
               <div class="record-counts">
                 <span>정답 {{ row.correct }}</span>
                 <span>오답 {{ row.wrong }}</span>
+                <span v-if="recordMetric === 'speed'">정답 평균 {{ formatResponseTime(row.averageResponseMs) }}</span>
               </div>
-              <strong class="record-rate">{{ row.accuracy }}%</strong>
+              <strong class="record-rate">
+                {{ recordMetric === 'accuracy' ? `${row.accuracy}%` : formatResponseTime(row.averageResponseMs) }}
+              </strong>
             </div>
           </div>
         </article>
@@ -643,15 +832,15 @@ h1 {
 }
 
 .view-tabs,
-.mode-tabs,
-.level-tabs {
+.level-tabs,
+.metric-tabs {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
 
 .view-tabs,
-.mode-tabs {
+.metric-tabs {
   margin-bottom: 10px;
 }
 
@@ -660,16 +849,31 @@ h1 {
 }
 
 .view-tabs button,
-.mode-tabs button,
-.level-tabs button {
+.level-tabs button,
+.metric-tabs button {
   min-height: 44px;
   color: #1d2733;
   background: #dce5e9;
 }
 
+.metric-tabs button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.metric-tabs span {
+  padding: 3px 6px;
+  border-radius: 999px;
+  color: #28666e;
+  background: #fff;
+  font-size: 0.72rem;
+}
+
 .view-tabs button.active,
-.mode-tabs button.active,
-.level-tabs button.active {
+.level-tabs button.active,
+.metric-tabs button.active {
   color: #fff;
   background: #28666e;
 }
@@ -716,17 +920,6 @@ h1 {
   font-weight: 800;
 }
 
-.timer {
-  margin: 0 0 12px;
-  color: #28666e;
-  font-size: 1.1rem;
-  font-weight: 900;
-}
-
-.timer.danger {
-  color: #b84b32;
-}
-
 .prompt {
   width: 100%;
   overflow-wrap: anywhere;
@@ -763,6 +956,34 @@ h1 {
   font-weight: 800;
 }
 
+.answer-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.answer-form input {
+  min-height: 48px;
+  width: 100%;
+  padding: 0 14px;
+  border: 1px solid #cfd8df;
+  border-radius: 8px;
+  color: #1d2733;
+  background: #fff;
+  font: inherit;
+  font-weight: 800;
+}
+
+.answer-form input:focus {
+  border-color: #28666e;
+  outline: 3px solid rgb(40 102 110 / 18%);
+}
+
+.answer-form button {
+  min-height: 48px;
+}
+
 .actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -779,6 +1000,14 @@ h1 {
   grid-column: 1 / -1;
   justify-self: center;
   width: min(100%, 220px);
+}
+
+.actions .muted-action {
+  background: #73808c;
+}
+
+.actions .muted-action:hover {
+  background: #606c77;
 }
 
 .actions .wide {
