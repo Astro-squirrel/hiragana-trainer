@@ -486,7 +486,7 @@ function giveUpAndShowAnswer() {
 
 function focusAnswerInput() {
   nextTick(() => {
-    answerInputElement.value?.focus()
+    answerInputElement.value?.focus({ preventScroll: true })
   })
 }
 
@@ -1138,7 +1138,13 @@ h1 {
 
 @media (max-width: 430px) {
   .app-shell {
+    display: block;
+    min-height: 100dvh;
     padding: 16px;
+  }
+
+  .trainer {
+    margin: 0 auto;
   }
 
   h1 {
@@ -1146,12 +1152,43 @@ h1 {
   }
 
   .card {
-    min-height: 300px;
-    padding: 22px 18px;
+    min-height: 230px;
+    padding: 20px 16px;
+  }
+
+  .prompt {
+    font-size: clamp(3.5rem, 24vw, 6.5rem);
+  }
+
+  .answer-form {
+    grid-template-columns: minmax(0, 1fr) 76px;
+  }
+
+  .answer-form input {
+    min-height: 44px;
+    padding: 0 12px;
+  }
+
+  .answer-form button {
+    min-height: 44px;
   }
 
   .stats {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .stats div {
+    padding: 10px 4px;
+  }
+
+  .stats dt {
+    font-size: 0.68rem;
+    line-height: 1.25;
+  }
+
+  .stats dd {
+    font-size: 1.2rem;
   }
 
   .record-row {
