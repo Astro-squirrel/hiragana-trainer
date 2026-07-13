@@ -468,9 +468,99 @@ const wordCards = [
   { word: 'すみません', readingKo: '스미마센', meaningKo: '실례합니다/죄송합니다', romaji: 'sumimasen', category: 'daily' },
 ]
 
+const additionalDailyWords = [
+  ['へや', '헤야', '방', 'heya'], ['げんかん', '겐칸', '현관', 'genkan'], ['まど', '마도', '창문', 'mado'], ['どあ', '도아', '문', 'doa'],
+  ['ゆか', '유카', '바닥', 'yuka'], ['てんじょう', '텐죠-', '천장', 'tenjou'], ['かべ', '카베', '벽', 'kabe'], ['つくえ', '츠쿠에', '책상', 'tsukue'],
+  ['いす', '이스', '의자', 'isu'], ['たな', '타나', '선반', 'tana'], ['べっど', '벳도', '침대', 'beddo'], ['ふとん', '후톤', '이불', 'futon'],
+  ['まくら', '마쿠라', '베개', 'makura'], ['かがみ', '카가미', '거울', 'kagami'], ['かぎ', '카기', '열쇠', 'kagi'], ['でんき', '덴키', '전기/불', 'denki'],
+  ['れいぞうこ', '레이조-코', '냉장고', 'reizouko'], ['せんたくき', '센타쿠키', '세탁기', 'sentakuki'], ['そうじき', '소-지키', '청소기', 'soujiki'], ['でんわ', '덴와', '전화', 'denwa'],
+  ['てれび', '테레비', '텔레비전', 'terebi'], ['ぱそこん', '파소콘', '컴퓨터', 'pasokon'], ['ほんだな', '혼다나', '책장', 'hondana'], ['ごみばこ', '고미바코', '쓰레기통', 'gomibako'],
+  ['たおる', '타오루', '수건', 'taoru'], ['せっけん', '셋켄', '비누', 'sekken'], ['はぶらし', '하부라시', '칫솔', 'haburashi'], ['はみがき', '하미가키', '양치', 'hamigaki'],
+  ['しゃんぷー', '샴푸-', '샴푸', 'shanpuu'], ['かみ', '카미', '머리카락', 'kami'], ['め', '메', '눈', 'me'], ['みみ', '미미', '귀', 'mimi'],
+  ['はな', '하나', '코', 'hana'], ['くち', '쿠치', '입', 'kuchi'], ['は', '하', '이', 'ha'], ['て', '테', '손', 'te'],
+  ['あし', '아시', '발/다리', 'ashi'], ['ゆび', '유비', '손가락', 'yubi'], ['おなか', '오나카', '배', 'onaka'], ['せなか', '세나카', '등', 'senaka'],
+  ['かた', '카타', '어깨', 'kata'], ['のど', '노도', '목', 'nodo'], ['びょうき', '뵤-키', '병', 'byouki'], ['けが', '케가', '부상', 'kega'],
+  ['びょういん', '뵤-인', '병원', 'byouin'], ['よやく', '요야쿠', '예약', 'yoyaku'], ['けんこう', '켄코-', '건강', 'kenkou'], ['かぜ', '카제', '감기', 'kaze'],
+  ['うわぎ', '우와기', '겉옷', 'uwagi'], ['したぎ', '시타기', '속옷', 'shitagi'], ['ぼうし', '보-시', '모자', 'boushi'], ['かばん', '카방', '가방', 'kaban'],
+  ['さいふ', '사이후', '지갑', 'saifu'], ['めがね', '메가네', '안경', 'megane'], ['ゆびわ', '유비와', '반지', 'yubiwa'], ['かさ', '카사', '우산', 'kasa'],
+  ['じてんしゃ', '지텐샤', '자전거', 'jitensha'], ['ばす', '바스', '버스', 'basu'], ['たくしー', '타쿠시-', '택시', 'takushii'], ['ひこうき', '히코-키', '비행기', 'hikouki'],
+  ['くうこう', '쿠-코-', '공항', 'kuukou'], ['ちかてつ', '치카테츠', '지하철', 'chikatetsu'], ['しんごう', '싱고-', '신호등', 'shingou'], ['こうさてん', '코-사텐', '교차로', 'kousaten'],
+  ['こうえん', '코-엔', '공원', 'kouen'], ['としょかん', '토쇼칸', '도서관', 'toshokan'], ['ぎんこう', '깅코-', '은행', 'ginkou'], ['ゆうびんきょく', '유-빙쿄쿠', '우체국', 'yuubinkyoku'],
+  ['こんびに', '콘비니', '편의점', 'konbini'], ['すーぱー', '스-파-', '슈퍼마켓', 'suupaa'], ['れすとらん', '레스토랑', '식당', 'resutoran'], ['きっさてん', '킷사텐', '찻집', 'kissaten'],
+  ['ほてる', '호테루', '호텔', 'hoteru'], ['がっこう', '각코-', '학교', 'gakkou'], ['きょうしつ', '쿄-시츠', '교실', 'kyoushitsu'], ['だいがく', '다이가쿠', '대학교', 'daigaku'],
+  ['せんせい', '센세-', '선생님', 'sensei'], ['がくせい', '각세-', '학생', 'gakusei'], ['かぞく', '카조쿠', '가족', 'kazoku'], ['りょうしん', '료-신', '부모님', 'ryoushin'],
+  ['ちち', '치치', '아버지', 'chichi'], ['はは', '하하', '어머니', 'haha'], ['あに', '아니', '형/오빠', 'ani'], ['あね', '아네', '누나/언니', 'ane'],
+  ['おとうと', '오토-토', '남동생', 'otouto'], ['いもうと', '이모-토', '여동생', 'imouto'], ['しゅじん', '슈진', '남편', 'shujin'], ['つま', '츠마', '아내', 'tsuma'],
+  ['みず', '미즈', '물', 'mizu'], ['おちゃ', '오차', '차', 'ocha'], ['こーひー', '코-히-', '커피', 'koohii'], ['ぎゅうにゅう', '규-뉴-', '우유', 'gyuunyuu'],
+  ['じゅーす', '주-스', '주스', 'juusu'], ['ぱん', '팡', '빵', 'pan'], ['ごはん', '고한', '밥', 'gohan'], ['すーぷ', '스-푸', '수프', 'suupu'],
+  ['さらだ', '사라다', '샐러드', 'sarada'], ['みそしる', '미소시루', '된장국', 'misoshiru'], ['うどん', '우동', '우동', 'udon'], ['そば', '소바', '메밀국수', 'soba'],
+  ['らーめん', '라-멘', '라멘', 'raamen'], ['すし', '스시', '초밥', 'sushi'], ['おにぎり', '오니기리', '주먹밥', 'onigiri'], ['べんとう', '벤토-', '도시락', 'bentou'],
+  ['しお', '시오', '소금', 'shio'], ['さとう', '사토-', '설탕', 'satou'], ['しょうゆ', '쇼-유', '간장', 'shouyu'], ['あぶら', '아부라', '기름', 'abura'],
+  ['いぬ', '이누', '개', 'inu'], ['ねこ', '네코', '고양이', 'neko'], ['とり', '토리', '새', 'tori'], ['うま', '우마', '말', 'uma'],
+  ['さくら', '사쿠라', '벚꽃', 'sakura'], ['はなび', '하나비', '불꽃놀이', 'hanabi'], ['あめ', '아메', '비', 'ame'], ['ゆき', '유키', '눈', 'yuki'],
+  ['くも', '쿠모', '구름', 'kumo'], ['そら', '소라', '하늘', 'sora'], ['ほし', '호시', '별', 'hoshi'], ['つき', '츠키', '달', 'tsuki'],
+  ['はる', '하루', '봄', 'haru'], ['なつ', '나츠', '여름', 'natsu'], ['あき', '아키', '가을', 'aki'], ['ふゆ', '후유', '겨울', 'fuyu'],
+  ['けさ', '케사', '오늘 아침', 'kesa'], ['こんしゅう', '콘슈-', '이번 주', 'konshuu'], ['らいしゅう', '라이슈-', '다음 주', 'raishuu'], ['せんしゅう', '센슈-', '지난주', 'senshuu'],
+  ['たんじょうび', '탄죠-비', '생일', 'tanjoubi'], ['しゅくだい', '슈쿠다이', '숙제', 'shukudai'], ['しつもん', '시츠몬', '질문', 'shitsumon'], ['こたえ', '코타에', '대답', 'kotae'],
+  ['いみ', '이미', '의미', 'imi'], ['もんだい', '몬다이', '문제', 'mondai'], ['れんしゅう', '렌슈-', '연습', 'renshuu'], ['しけん', '시켄', '시험', 'shiken'],
+  ['しゃしん', '샤신', '사진', 'shashin'], ['えいが', '에-가', '영화', 'eiga'], ['おんがく', '온가쿠', '음악', 'ongaku'], ['うた', '우타', '노래', 'uta'],
+  ['にゅーす', '뉴-스', '뉴스', 'nyuusu'], ['げーむ', '게-무', '게임', 'geemu'], ['りょこう', '료코-', '여행', 'ryokou'], ['しゅみ', '슈미', '취미', 'shumi'],
+].map(([word, readingKo, meaningKo, romaji]) => ({ word, readingKo, meaningKo, romaji, category: 'daily' }))
+
+const ichidanVerbStems = [
+  ['あけ', '아케', '열다', 'ake'], ['あげ', '아게', '주다', 'age'], ['あび', '아비', '샤워하다', 'abi'], ['あつめ', '아츠메', '모으다', 'atsume'],
+  ['いれ', '이레', '넣다', 'ire'], ['うけ', '우케', '받다', 'uke'], ['うまれ', '우마레', '태어나다', 'umare'], ['おしえ', '오시에', '가르치다', 'oshie'],
+  ['おり', '오리', '내리다', 'ori'], ['かけ', '카케', '걸다', 'kake'], ['かり', '카리', '빌리다', 'kari'], ['きめ', '키메', '정하다', 'kime'],
+  ['こたえ', '코타에', '대답하다', 'kotae'], ['こわれ', '코와레', '고장 나다', 'koware'], ['しらべ', '시라베', '조사하다', 'shirabe'], ['しんじ', '신지', '믿다', 'shinji'],
+  ['すて', '스테', '버리다', 'sute'], ['たすけ', '타스케', '돕다', 'tasuke'], ['たて', '타테', '세우다', 'tate'], ['つけ', '츠케', '켜다/붙이다', 'tsuke'],
+  ['つづけ', '츠즈케', '계속하다', 'tsuzuke'], ['つとめ', '츠토메', '근무하다', 'tsutome'], ['でかけ', '데카케', '외출하다', 'dekake'], ['とめ', '토메', '멈추다', 'tome'],
+  ['ならべ', '나라베', '늘어놓다', 'narabe'], ['にげ', '니게', '도망가다', 'nige'], ['はじめ', '하지메', '시작하다', 'hajime'], ['ほめ', '호메', '칭찬하다', 'home'],
+  ['まけ', '마케', '지다', 'make'], ['まちがえ', '마치가에', '틀리다', 'machigae'], ['みせ', '미세', '보여주다', 'mise'], ['みつけ', '미츠케', '찾다', 'mitsuke'],
+  ['むかえ', '무카에', '맞이하다', 'mukae'], ['やめ', '야메', '그만두다', 'yame'], ['わすれ', '와스레', '잊다', 'wasure'], ['わけ', '와케', '나누다', 'wake'],
+  ['あきらめ', '아키라메', '포기하다', 'akirame'], ['おぼえ', '오보에', '외우다', 'oboe'], ['かんがえ', '캉가에', '생각하다', 'kangae'], ['くらべ', '쿠라베', '비교하다', 'kurabe'],
+  ['しめ', '시메', '닫다', 'shime'], ['たしかめ', '타시카메', '확인하다', 'tashikame'], ['たのしめ', '타노시메', '즐기다', 'tanoshime'], ['つかれ', '츠카레', '피곤해지다', 'tsukare'],
+  ['なれ', '나레', '익숙해지다', 'nare'], ['に', '니', '삶다', 'ni'], ['みとめ', '미토메', '인정하다', 'mitome'], ['あずけ', '아즈케', '맡기다', 'azuke'],
+]
+
+const additionalVerbCards = ichidanVerbStems.flatMap(([stem, readingStem, meaningKo, romajiStem]) => [
+  { word: `${stem}る`, readingKo: `${readingStem}루`, meaningKo, romaji: `${romajiStem}ru`, category: 'daily' },
+  { word: `${stem}ます`, readingKo: `${readingStem}마스`, meaningKo: `${meaningKo} (공손형)`, romaji: `${romajiStem}masu`, category: 'daily' },
+  { word: `${stem}て`, readingKo: `${readingStem}테`, meaningKo: `${meaningKo} (연결형)`, romaji: `${romajiStem}te`, category: 'daily' },
+  { word: `${stem}ない`, readingKo: `${readingStem}나이`, meaningKo: `${meaningKo} (부정형)`, romaji: `${romajiStem}nai`, category: 'daily' },
+])
+
+const finalDailyWords = [
+  ['けいたい', '케-타이', '휴대전화', 'keitai'], ['じゅうでんき', '주-덴키', '충전기', 'juudenki'], ['いんたーねっと', '인타-넷토', '인터넷', 'intaanetto'], ['めーる', '메-루', '이메일', 'meeru'],
+  ['かいぎ', '카이기', '회의', 'kaigi'], ['しりょう', '시료-', '자료', 'shiryou'], ['めも', '메모', '메모', 'memo'],
+  ['いんさつ', '인사츠', '인쇄', 'insatsu'], ['でんたく', '덴타쿠', '계산기', 'dentaku'], ['れじ', '레지', '계산대', 'reji'], ['りょうしゅうしょ', '료-슈-쇼', '영수증', 'ryoushuusho'],
+  ['ねだん', '네단', '가격', 'nedan'], ['おつり', '오츠리', '거스름돈', 'otsuri'], ['げんきん', '겐킨', '현금', 'genkin'], ['てぶくろ', '테부쿠로', '장갑', 'tebukuro'],
+  ['ふでばこ', '후데바코', '필통', 'fudebako'], ['けしごむ', '케시고무', '지우개', 'keshigomu'], ['えんぴつ', '엔피츠', '연필', 'enpitsu'], ['のーと', '노-토', '노트', 'nooto'],
+  ['じしょ', '지쇼', '사전', 'jisho'], ['ちず', '치즈', '지도', 'chizu'], ['かれんだー', '카렌다-', '달력', 'karendaa'], ['すいぞくかん', '스이조쿠칸', '수족관', 'suizokukan'],
+  ['どうぶつえん', '도-부츠엔', '동물원', 'doubutsuen'],
+].map(([word, readingKo, meaningKo, romaji]) => ({ word, readingKo, meaningKo, romaji, category: 'daily' }))
+
+const uniqueWordCards = Array.from(
+  new Map([...wordCards, ...additionalDailyWords, ...additionalVerbCards, ...finalDailyWords].map((card) => [card.word, card])).values()
+)
+
+wordCards.splice(0, wordCards.length, ...uniqueWordCards)
+
 const katakanaKanaCards = kanaCards.map(convertCardToKatakana)
 const katakanaWordCards = wordCards.map(convertCardToKatakana)
 const katakanaChartSections = convertChartSectionsToKatakana(hiraganaChartSections)
+const combinedChartSections = hiraganaChartSections.map((section, sectionIndex) => ({
+  ...section,
+  rows: section.rows.map((row, rowIndex) =>
+    row.map((item, itemIndex) => {
+      if (!item) return null
+
+      return {
+        ...item,
+        katakana: katakanaChartSections[sectionIndex].rows[rowIndex][itemIndex].kana,
+      }
+    })
+  ),
+}))
 
 const level = ref(1)
 const currentCard = ref(null)
@@ -488,6 +578,7 @@ const resultState = ref('')
 const answerInput = ref('')
 const answerInputElement = ref(null)
 const isChartVisible = ref(false)
+const chartView = ref('hiragana')
 const chartZoom = ref(1)
 const todayCount = ref(0)
 const correctCount = ref(0)
@@ -513,14 +604,20 @@ const cardText = computed(() => {
 
 const scriptLabel = computed(() => (scriptMode.value === 'hiragana' ? '히라가나' : '가타카나'))
 
-const chartEyebrow = computed(() => (scriptMode.value === 'hiragana' ? 'Hiragana Chart' : 'Katakana Chart'))
+const chartEyebrow = computed(() => {
+  if (chartView.value === 'combined') return 'Kana Chart'
+  return chartView.value === 'hiragana' ? 'Hiragana Chart' : 'Katakana Chart'
+})
 
 const chartButtonLabel = computed(() => `${scriptLabel.value} 보기`)
 
-const chartTitle = computed(() => `${scriptLabel.value} 전체 보기`)
+const chartTitle = computed(() => {
+  if (chartView.value === 'combined') return '히라가나 · 가타카나 전체 보기'
+  return `${chartView.value === 'hiragana' ? '히라가나' : '가타카나'} 전체 보기`
+})
 
 const currentChartSections = computed(() =>
-  scriptMode.value === 'hiragana' ? hiraganaChartSections : katakanaChartSections
+  chartView.value === 'katakana' ? katakanaChartSections : hiraganaChartSections
 )
 
 const currentWrongCards = computed(() => wrongCards.value[scriptMode.value])
@@ -650,6 +747,11 @@ function changeChartZoom(amount) {
 
 function resetChartZoom() {
   chartZoom.value = 1
+}
+
+function openChart() {
+  chartView.value = scriptMode.value
+  isChartVisible.value = true
 }
 
 function recordCardResult(card, result, responseMs = 0) {
@@ -954,7 +1056,7 @@ onUnmounted(() => {
       <header class="header">
         <div class="top-bar">
           <p class="eyebrow">Japanese Reading</p>
-          <button class="chart-open-button" type="button" @click="isChartVisible = true">{{ chartButtonLabel }}</button>
+          <button class="chart-open-button" type="button" @click="openChart">{{ chartButtonLabel }}</button>
         </div>
         <div class="title-row">
           <h1>일본어 읽기 훈련</h1>
@@ -1147,6 +1249,33 @@ onUnmounted(() => {
           </button>
         </header>
 
+        <div class="chart-mode-tabs" aria-label="전체 보기 문자 선택">
+          <button
+            type="button"
+            :class="{ active: chartView === 'hiragana' }"
+            :aria-pressed="chartView === 'hiragana'"
+            @click="chartView = 'hiragana'"
+          >
+            히라가나
+          </button>
+          <button
+            type="button"
+            :class="{ active: chartView === 'katakana' }"
+            :aria-pressed="chartView === 'katakana'"
+            @click="chartView = 'katakana'"
+          >
+            가타카나
+          </button>
+          <button
+            type="button"
+            :class="{ active: chartView === 'combined' }"
+            :aria-pressed="chartView === 'combined'"
+            @click="chartView = 'combined'"
+          >
+            같이 보기
+          </button>
+        </div>
+
         <div class="chart-controls" aria-label="표 확대 조절">
           <button type="button" @click="changeChartZoom(-0.1)">축소</button>
           <span>{{ chartZoomPercent }}%</span>
@@ -1154,26 +1283,50 @@ onUnmounted(() => {
           <button type="button" @click="resetChartZoom">초기화</button>
         </div>
 
-        <div class="chart-scroll" :style="{ '--chart-zoom': chartZoom }">
-          <section class="chart-section" v-for="section in currentChartSections" :key="section.title">
-            <h3>{{ section.title }}</h3>
-            <div class="kana-chart" :class="{ compact: section.title === '요음' }">
-              <template v-for="(row, rowIndex) in section.rows" :key="`${section.title}-${rowIndex}`">
-                <div
-                  class="kana-cell"
-                  v-for="(item, itemIndex) in row"
-                  :key="`${section.title}-${rowIndex}-${itemIndex}`"
-                  :class="{ empty: !item }"
-                >
-                  <template v-if="item">
-                    <strong>{{ item.kana }}</strong>
-                    <span>{{ item.romaji }}</span>
-                    <em>{{ item.readingKo }}</em>
-                  </template>
-                </div>
-              </template>
-            </div>
-          </section>
+        <div class="chart-scroll" :class="{ combined: chartView === 'combined' }" :style="{ '--chart-zoom': chartZoom }">
+          <template v-if="chartView !== 'combined'">
+            <section class="chart-section" v-for="section in currentChartSections" :key="section.title">
+              <h3>{{ section.title }}</h3>
+              <div class="kana-chart" :class="{ compact: section.title === '요음' }">
+                <template v-for="(row, rowIndex) in section.rows" :key="`${section.title}-${rowIndex}`">
+                  <div
+                    class="kana-cell"
+                    v-for="(item, itemIndex) in row"
+                    :key="`${section.title}-${rowIndex}-${itemIndex}`"
+                    :class="{ empty: !item }"
+                  >
+                    <template v-if="item">
+                      <strong>{{ item.kana }}</strong>
+                      <span>{{ item.romaji }}</span>
+                      <em>{{ item.readingKo }}</em>
+                    </template>
+                  </div>
+                </template>
+              </div>
+            </section>
+          </template>
+
+          <template v-else>
+            <section class="chart-section" v-for="section in combinedChartSections" :key="section.title">
+              <h3>{{ section.title }}</h3>
+              <div class="kana-chart" :class="{ compact: section.title === '요음' }">
+                <template v-for="(row, rowIndex) in section.rows" :key="`${section.title}-${rowIndex}`">
+                  <div
+                    class="kana-cell"
+                    v-for="(item, itemIndex) in row"
+                    :key="`${section.title}-${rowIndex}-${itemIndex}`"
+                    :class="{ empty: !item }"
+                  >
+                    <template v-if="item">
+                      <strong class="kana-pair"><span>{{ item.kana }}</span><span aria-hidden="true"> / </span><span>{{ item.katakana }}</span></strong>
+                      <span>{{ item.romaji }}</span>
+                      <em>{{ item.readingKo }}</em>
+                    </template>
+                  </div>
+                </template>
+              </div>
+            </section>
+          </template>
         </div>
       </section>
     </div>
@@ -1644,7 +1797,7 @@ h1 {
 
 .chart-dialog {
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
+  grid-template-rows: auto auto auto minmax(0, 1fr);
   width: min(100%, 920px);
   max-height: min(92vh, 860px);
   overflow: hidden;
@@ -1675,6 +1828,25 @@ h1 {
   padding: 12px 18px;
   border-bottom: 1px solid #e0e6eb;
   background: #f8fafb;
+}
+
+.chart-mode-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 12px 18px;
+  border-bottom: 1px solid #e0e6eb;
+}
+
+.chart-mode-tabs button {
+  min-height: 36px;
+  padding: 0 14px;
+  color: #52606d;
+  background: #e8eef1;
+}
+
+.chart-mode-tabs button.active {
+  color: #fff;
+  background: #28666e;
 }
 
 .chart-controls button {
@@ -1739,6 +1911,14 @@ h1 {
   line-height: 1;
 }
 
+.kana-cell .kana-pair {
+  display: flex;
+  gap: calc(4px * var(--chart-zoom));
+  align-items: center;
+  white-space: nowrap;
+  font-size: calc(1.65rem * var(--chart-zoom));
+}
+
 .kana-cell span {
   margin-top: calc(7px * var(--chart-zoom));
   color: #28666e;
@@ -1801,6 +1981,16 @@ h1 {
 
   .chart-controls {
     padding: 10px 14px;
+  }
+
+  .chart-mode-tabs {
+    padding: 10px 14px;
+  }
+
+  .chart-mode-tabs button {
+    flex: 1;
+    padding: 0 8px;
+    font-size: 0.82rem;
   }
 
   .chart-scroll {
