@@ -536,7 +536,7 @@ const finalDailyWords = [
   ['ねだん', '네단', '가격', 'nedan'], ['おつり', '오츠리', '거스름돈', 'otsuri'], ['げんきん', '겐킨', '현금', 'genkin'], ['てぶくろ', '테부쿠로', '장갑', 'tebukuro'],
   ['ふでばこ', '후데바코', '필통', 'fudebako'], ['けしごむ', '케시고무', '지우개', 'keshigomu'], ['えんぴつ', '엔피츠', '연필', 'enpitsu'], ['のーと', '노-토', '노트', 'nooto'],
   ['じしょ', '지쇼', '사전', 'jisho'], ['ちず', '치즈', '지도', 'chizu'], ['かれんだー', '카렌다-', '달력', 'karendaa'], ['すいぞくかん', '스이조쿠칸', '수족관', 'suizokukan'],
-  ['どうぶつえん', '도-부츠엔', '동물원', 'doubutsuen'],
+  ['どうぶつえん', '도-부츠엔', '동물원', 'doubutsuen'], ['ぷれぜんと', '푸레젠토', '선물', 'purezento'], ['おまつり', '오마츠리', '축제', 'omatsuri'],
 ].map(([word, readingKo, meaningKo, romaji]) => ({ word, readingKo, meaningKo, romaji, category: 'daily' }))
 
 const uniqueWordCards = Array.from(
@@ -578,8 +578,16 @@ const resultState = ref('')
 const answerInput = ref('')
 const answerInputElement = ref(null)
 const isChartVisible = ref(false)
+const isVocabularyVisible = ref(false)
 const chartView = ref('hiragana')
 const chartZoom = ref(1)
+const vocabularyQuery = ref('')
+const vocabularyVisibleColumns = ref({
+  hiragana: true,
+  katakana: true,
+  reading: true,
+  meaning: true,
+})
 const todayCount = ref(0)
 const correctCount = ref(0)
 const wrongCount = ref(0)
@@ -629,6 +637,22 @@ const trainingWordCards = computed(() => (scriptMode.value === 'hiragana' ? word
 const levelLabel = computed(() => (level.value === 1 ? `${scriptLabel.value} 음 카드` : `${scriptLabel.value} 단어 카드`))
 
 const recordCards = computed(() => (level.value === 1 ? trainingKanaCards.value : trainingWordCards.value))
+
+const vocabularyCards = computed(() => {
+  const query = vocabularyQuery.value.trim().toLowerCase()
+
+  if (!query) return wordCards
+
+  return wordCards.filter((card) =>
+    [card.word, toKatakanaText(card.word), card.readingKo, card.meaningKo, card.romaji].some((value) =>
+      value.toLowerCase().includes(query)
+    )
+  )
+})
+
+const visibleVocabularyColumnCount = computed(
+  () => Object.values(vocabularyVisibleColumns.value).filter(Boolean).length
+)
 
 const recordSortLabel = computed(() => (recordSortDirection.value === 'desc' ? '내림차순' : '오름차순'))
 
@@ -752,6 +776,16 @@ function resetChartZoom() {
 function openChart() {
   chartView.value = scriptMode.value
   isChartVisible.value = true
+}
+
+function openVocabulary() {
+  vocabularyQuery.value = ''
+  isVocabularyVisible.value = true
+}
+
+function toggleVocabularyColumn(column) {
+  if (vocabularyVisibleColumns.value[column] && visibleVocabularyColumnCount.value === 1) return
+  vocabularyVisibleColumns.value[column] = !vocabularyVisibleColumns.value[column]
 }
 
 function recordCardResult(card, result, responseMs = 0) {
@@ -1056,7 +1090,10 @@ onUnmounted(() => {
       <header class="header">
         <div class="top-bar">
           <p class="eyebrow">Japanese Reading</p>
-          <button class="chart-open-button" type="button" @click="openChart">{{ chartButtonLabel }}</button>
+          <div class="top-actions">
+            <button class="vocabulary-open-button" type="button" @click="openVocabulary">단어장</button>
+            <button class="chart-open-button" type="button" @click="openChart">{{ chartButtonLabel }}</button>
+          </div>
         </div>
         <div class="title-row">
           <h1>일본어 읽기 훈련</h1>
@@ -1330,6 +1367,55 @@ onUnmounted(() => {
         </div>
       </section>
     </div>
+
+    <div class="chart-overlay" v-if="isVocabularyVisible" @click.self="isVocabularyVisible = false">
+      <section class="vocabulary-dialog" aria-label="일본어 단어장">
+        <header class="chart-header">
+          <div>
+            <p class="eyebrow">Vocabulary</p>
+            <h2>일본어 단어장</h2>
+          </div>
+          <button class="chart-close-button" type="button" aria-label="닫기" @click="isVocabularyVisible = false">
+            닫기
+          </button>
+        </header>
+
+        <div class="vocabulary-toolbar">
+          <input v-model="vocabularyQuery" type="search" placeholder="단어, 뜻, 발음, 로마자로 검색" aria-label="단어장 검색" />
+          <div class="vocabulary-column-controls" aria-label="단어장 표시 항목">
+            <button type="button" :class="{ active: vocabularyVisibleColumns.hiragana }" :aria-pressed="vocabularyVisibleColumns.hiragana" @click="toggleVocabularyColumn('hiragana')">히라가나</button>
+            <button type="button" :class="{ active: vocabularyVisibleColumns.katakana }" :aria-pressed="vocabularyVisibleColumns.katakana" @click="toggleVocabularyColumn('katakana')">가타카나</button>
+            <button type="button" :class="{ active: vocabularyVisibleColumns.reading }" :aria-pressed="vocabularyVisibleColumns.reading" @click="toggleVocabularyColumn('reading')">발음</button>
+            <button type="button" :class="{ active: vocabularyVisibleColumns.meaning }" :aria-pressed="vocabularyVisibleColumns.meaning" @click="toggleVocabularyColumn('meaning')">뜻</button>
+          </div>
+          <strong>{{ vocabularyCards.length }} / {{ wordCards.length }}개</strong>
+        </div>
+
+        <div class="vocabulary-table-wrap">
+          <table class="vocabulary-table" :class="{ compact: visibleVocabularyColumnCount < 4 }">
+            <thead>
+              <tr>
+                <th v-if="vocabularyVisibleColumns.hiragana" scope="col"><button type="button" @click="toggleVocabularyColumn('hiragana')">히라가나</button></th>
+                <th v-if="vocabularyVisibleColumns.katakana" scope="col"><button type="button" @click="toggleVocabularyColumn('katakana')">가타카나</button></th>
+                <th v-if="vocabularyVisibleColumns.reading" scope="col"><button type="button" @click="toggleVocabularyColumn('reading')">한글 발음</button></th>
+                <th v-if="vocabularyVisibleColumns.meaning" scope="col"><button type="button" @click="toggleVocabularyColumn('meaning')">뜻</button></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="card in vocabularyCards" :key="card.word">
+                <td v-if="vocabularyVisibleColumns.hiragana" class="vocabulary-kana">{{ card.word }}</td>
+                <td v-if="vocabularyVisibleColumns.katakana" class="vocabulary-kana">{{ toKatakanaText(card.word) }}</td>
+                <td v-if="vocabularyVisibleColumns.reading">{{ card.readingKo }}</td>
+                <td v-if="vocabularyVisibleColumns.meaning">{{ card.meaningKo }}</td>
+              </tr>
+              <tr v-if="vocabularyCards.length === 0">
+                <td class="vocabulary-empty" :colspan="visibleVocabularyColumnCount">검색 결과가 없습니다.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
   </main>
 </template>
 
@@ -1393,6 +1479,11 @@ button:active {
   margin-bottom: 6px;
 }
 
+.top-actions {
+  display: flex;
+  gap: 8px;
+}
+
 .eyebrow {
   margin: 0;
   color: #5d6875;
@@ -1403,6 +1494,7 @@ button:active {
 }
 
 .chart-open-button,
+.vocabulary-open-button,
 .chart-close-button {
   min-height: 36px;
   padding: 0 12px;
@@ -1412,6 +1504,7 @@ button:active {
 }
 
 .chart-open-button:hover,
+.vocabulary-open-button:hover,
 .chart-close-button:hover {
   background: #cbd8df;
 }
@@ -1806,6 +1899,17 @@ h1 {
   box-shadow: 0 24px 60px rgb(29 39 51 / 28%);
 }
 
+.vocabulary-dialog {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  width: min(100%, 1020px);
+  max-height: min(92vh, 860px);
+  overflow: hidden;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 24px 60px rgb(29 39 51 / 28%);
+}
+
 .chart-header {
   display: flex;
   align-items: center;
@@ -1865,6 +1969,115 @@ h1 {
 .chart-scroll {
   overflow: auto;
   padding: 18px;
+}
+
+.vocabulary-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  border-bottom: 1px solid #e0e6eb;
+  background: #f8fafb;
+}
+
+.vocabulary-toolbar input {
+  flex: 1;
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid #c8d3da;
+  border-radius: 6px;
+  color: #1d2733;
+  background: #fff;
+  font: inherit;
+}
+
+.vocabulary-toolbar input:focus {
+  outline: 2px solid #28666e;
+  outline-offset: 1px;
+}
+
+.vocabulary-toolbar strong {
+  min-width: 76px;
+  color: #28666e;
+  text-align: right;
+}
+
+.vocabulary-column-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.vocabulary-column-controls button {
+  min-height: 32px;
+  padding: 0 8px;
+  color: #667381;
+  background: #e4ebef;
+  font-size: 0.78rem;
+}
+
+.vocabulary-column-controls button.active {
+  color: #fff;
+  background: #28666e;
+}
+
+.vocabulary-table-wrap {
+  overflow: auto;
+}
+
+.vocabulary-table {
+  width: 100%;
+  min-width: 620px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.vocabulary-table.compact {
+  min-width: 0;
+}
+
+.vocabulary-table th,
+.vocabulary-table td {
+  padding: 12px 18px;
+  border-bottom: 1px solid #e0e6eb;
+}
+
+.vocabulary-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  color: #52606d;
+  background: #f8fafb;
+  font-size: 0.82rem;
+}
+
+.vocabulary-table th button {
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  font-weight: 900;
+}
+
+.vocabulary-table th button:hover {
+  color: #28666e;
+}
+
+.vocabulary-table tbody tr:hover {
+  background: #f3f7f8;
+}
+
+.vocabulary-kana {
+  color: #1d2733;
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+
+.vocabulary-empty {
+  padding: 36px !important;
+  color: #667381;
+  text-align: center;
 }
 
 .chart-section + .chart-section {
@@ -1953,6 +2166,10 @@ h1 {
     align-items: flex-start;
   }
 
+  .top-actions {
+    gap: 6px;
+  }
+
   .title-row {
     align-items: stretch;
     justify-content: center;
@@ -1968,6 +2185,10 @@ h1 {
   }
 
   .chart-dialog {
+    max-height: calc(100dvh - 20px);
+  }
+
+  .vocabulary-dialog {
     max-height: calc(100dvh - 20px);
   }
 
@@ -1995,6 +2216,26 @@ h1 {
 
   .chart-scroll {
     padding: 14px;
+  }
+
+  .vocabulary-toolbar {
+    gap: 8px;
+    padding: 10px 14px;
+  }
+
+  .vocabulary-column-controls {
+    order: 3;
+    width: 100%;
+  }
+
+  .vocabulary-toolbar strong {
+    min-width: 62px;
+    font-size: 0.82rem;
+  }
+
+  .vocabulary-table th,
+  .vocabulary-table td {
+    padding: 10px 14px;
   }
 
   .kana-chart {
