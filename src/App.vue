@@ -108,6 +108,185 @@ const kanaCards = [
   { kana: 'ぴょ', readingKo: '표', romaji: 'pyo' },
 ]
 
+const hiraganaChartSections = [
+  {
+    title: '기본 오십음',
+    rows: [
+      [
+        { kana: 'あ', romaji: 'a', readingKo: '아' },
+        { kana: 'い', romaji: 'i', readingKo: '이' },
+        { kana: 'う', romaji: 'u', readingKo: '우' },
+        { kana: 'え', romaji: 'e', readingKo: '에' },
+        { kana: 'お', romaji: 'o', readingKo: '오' },
+      ],
+      [
+        { kana: 'か', romaji: 'ka', readingKo: '카' },
+        { kana: 'き', romaji: 'ki', readingKo: '키' },
+        { kana: 'く', romaji: 'ku', readingKo: '쿠' },
+        { kana: 'け', romaji: 'ke', readingKo: '케' },
+        { kana: 'こ', romaji: 'ko', readingKo: '코' },
+      ],
+      [
+        { kana: 'さ', romaji: 'sa', readingKo: '사' },
+        { kana: 'し', romaji: 'shi', readingKo: '시' },
+        { kana: 'す', romaji: 'su', readingKo: '스' },
+        { kana: 'せ', romaji: 'se', readingKo: '세' },
+        { kana: 'そ', romaji: 'so', readingKo: '소' },
+      ],
+      [
+        { kana: 'た', romaji: 'ta', readingKo: '타' },
+        { kana: 'ち', romaji: 'chi', readingKo: '치' },
+        { kana: 'つ', romaji: 'tsu', readingKo: '츠' },
+        { kana: 'て', romaji: 'te', readingKo: '테' },
+        { kana: 'と', romaji: 'to', readingKo: '토' },
+      ],
+      [
+        { kana: 'な', romaji: 'na', readingKo: '나' },
+        { kana: 'に', romaji: 'ni', readingKo: '니' },
+        { kana: 'ぬ', romaji: 'nu', readingKo: '누' },
+        { kana: 'ね', romaji: 'ne', readingKo: '네' },
+        { kana: 'の', romaji: 'no', readingKo: '노' },
+      ],
+      [
+        { kana: 'は', romaji: 'ha', readingKo: '하' },
+        { kana: 'ひ', romaji: 'hi', readingKo: '히' },
+        { kana: 'ふ', romaji: 'fu', readingKo: '후' },
+        { kana: 'へ', romaji: 'he', readingKo: '헤' },
+        { kana: 'ほ', romaji: 'ho', readingKo: '호' },
+      ],
+      [
+        { kana: 'ま', romaji: 'ma', readingKo: '마' },
+        { kana: 'み', romaji: 'mi', readingKo: '미' },
+        { kana: 'む', romaji: 'mu', readingKo: '무' },
+        { kana: 'め', romaji: 'me', readingKo: '메' },
+        { kana: 'も', romaji: 'mo', readingKo: '모' },
+      ],
+      [
+        { kana: 'や', romaji: 'ya', readingKo: '야' },
+        null,
+        { kana: 'ゆ', romaji: 'yu', readingKo: '유' },
+        null,
+        { kana: 'よ', romaji: 'yo', readingKo: '요' },
+      ],
+      [
+        { kana: 'ら', romaji: 'ra', readingKo: '라' },
+        { kana: 'り', romaji: 'ri', readingKo: '리' },
+        { kana: 'る', romaji: 'ru', readingKo: '루' },
+        { kana: 'れ', romaji: 're', readingKo: '레' },
+        { kana: 'ろ', romaji: 'ro', readingKo: '로' },
+      ],
+      [
+        { kana: 'わ', romaji: 'wa', readingKo: '와' },
+        null,
+        null,
+        null,
+        { kana: 'を', romaji: 'wo', readingKo: '오' },
+      ],
+      [{ kana: 'ん', romaji: 'n', readingKo: '응' }, null, null, null, null],
+    ],
+  },
+  {
+    title: '탁음·반탁음',
+    rows: [
+      [
+        { kana: 'が', romaji: 'ga', readingKo: '가' },
+        { kana: 'ぎ', romaji: 'gi', readingKo: '기' },
+        { kana: 'ぐ', romaji: 'gu', readingKo: '구' },
+        { kana: 'げ', romaji: 'ge', readingKo: '게' },
+        { kana: 'ご', romaji: 'go', readingKo: '고' },
+      ],
+      [
+        { kana: 'ざ', romaji: 'za', readingKo: '자' },
+        { kana: 'じ', romaji: 'ji', readingKo: '지' },
+        { kana: 'ず', romaji: 'zu', readingKo: '즈' },
+        { kana: 'ぜ', romaji: 'ze', readingKo: '제' },
+        { kana: 'ぞ', romaji: 'zo', readingKo: '조' },
+      ],
+      [
+        { kana: 'だ', romaji: 'da', readingKo: '다' },
+        { kana: 'ぢ', romaji: 'ji', readingKo: '지' },
+        { kana: 'づ', romaji: 'zu', readingKo: '즈' },
+        { kana: 'で', romaji: 'de', readingKo: '데' },
+        { kana: 'ど', romaji: 'do', readingKo: '도' },
+      ],
+      [
+        { kana: 'ば', romaji: 'ba', readingKo: '바' },
+        { kana: 'び', romaji: 'bi', readingKo: '비' },
+        { kana: 'ぶ', romaji: 'bu', readingKo: '부' },
+        { kana: 'べ', romaji: 'be', readingKo: '베' },
+        { kana: 'ぼ', romaji: 'bo', readingKo: '보' },
+      ],
+      [
+        { kana: 'ぱ', romaji: 'pa', readingKo: '파' },
+        { kana: 'ぴ', romaji: 'pi', readingKo: '피' },
+        { kana: 'ぷ', romaji: 'pu', readingKo: '푸' },
+        { kana: 'ぺ', romaji: 'pe', readingKo: '페' },
+        { kana: 'ぽ', romaji: 'po', readingKo: '포' },
+      ],
+    ],
+  },
+  {
+    title: '요음',
+    rows: [
+      [
+        { kana: 'きゃ', romaji: 'kya', readingKo: '캬' },
+        { kana: 'きゅ', romaji: 'kyu', readingKo: '큐' },
+        { kana: 'きょ', romaji: 'kyo', readingKo: '쿄' },
+      ],
+      [
+        { kana: 'しゃ', romaji: 'sha', readingKo: '샤' },
+        { kana: 'しゅ', romaji: 'shu', readingKo: '슈' },
+        { kana: 'しょ', romaji: 'sho', readingKo: '쇼' },
+      ],
+      [
+        { kana: 'ちゃ', romaji: 'cha', readingKo: '챠' },
+        { kana: 'ちゅ', romaji: 'chu', readingKo: '츄' },
+        { kana: 'ちょ', romaji: 'cho', readingKo: '쵸' },
+      ],
+      [
+        { kana: 'にゃ', romaji: 'nya', readingKo: '냐' },
+        { kana: 'にゅ', romaji: 'nyu', readingKo: '뉴' },
+        { kana: 'にょ', romaji: 'nyo', readingKo: '뇨' },
+      ],
+      [
+        { kana: 'ひゃ', romaji: 'hya', readingKo: '햐' },
+        { kana: 'ひゅ', romaji: 'hyu', readingKo: '휴' },
+        { kana: 'ひょ', romaji: 'hyo', readingKo: '효' },
+      ],
+      [
+        { kana: 'みゃ', romaji: 'mya', readingKo: '먀' },
+        { kana: 'みゅ', romaji: 'myu', readingKo: '뮤' },
+        { kana: 'みょ', romaji: 'myo', readingKo: '묘' },
+      ],
+      [
+        { kana: 'りゃ', romaji: 'rya', readingKo: '랴' },
+        { kana: 'りゅ', romaji: 'ryu', readingKo: '류' },
+        { kana: 'りょ', romaji: 'ryo', readingKo: '료' },
+      ],
+      [
+        { kana: 'ぎゃ', romaji: 'gya', readingKo: '갸' },
+        { kana: 'ぎゅ', romaji: 'gyu', readingKo: '규' },
+        { kana: 'ぎょ', romaji: 'gyo', readingKo: '교' },
+      ],
+      [
+        { kana: 'じゃ', romaji: 'ja', readingKo: '자' },
+        { kana: 'じゅ', romaji: 'ju', readingKo: '주' },
+        { kana: 'じょ', romaji: 'jo', readingKo: '조' },
+      ],
+      [
+        { kana: 'びゃ', romaji: 'bya', readingKo: '뱌' },
+        { kana: 'びゅ', romaji: 'byu', readingKo: '뷰' },
+        { kana: 'びょ', romaji: 'byo', readingKo: '뵤' },
+      ],
+      [
+        { kana: 'ぴゃ', romaji: 'pya', readingKo: '퍄' },
+        { kana: 'ぴゅ', romaji: 'pyu', readingKo: '퓨' },
+        { kana: 'ぴょ', romaji: 'pyo', readingKo: '표' },
+      ],
+    ],
+  },
+]
+
 const wordCards = [
   { word: 'やま', readingKo: '야마', meaningKo: '산', romaji: 'yama', category: 'basic' },
   { word: 'いぬ', readingKo: '이누', meaningKo: '개', romaji: 'inu', category: 'basic' },
@@ -209,7 +388,89 @@ const wordCards = [
   { word: 'ありがとう', readingKo: '아리가토-', meaningKo: '고마워', romaji: 'arigatou', category: 'chouon' },
   { word: 'こうえん', readingKo: '코-엔', meaningKo: '공원', romaji: 'kouen', category: 'chouon' },
   { word: 'びょうき', readingKo: '뵤-키', meaningKo: '병', romaji: 'byouki', category: 'chouon' },
+  { word: 'あさ', readingKo: '아사', meaningKo: '아침', romaji: 'asa', category: 'daily' },
+  { word: 'ひる', readingKo: '히루', meaningKo: '낮/점심때', romaji: 'hiru', category: 'daily' },
+  { word: 'よる', readingKo: '요루', meaningKo: '밤', romaji: 'yoru', category: 'daily' },
+  { word: 'きのう', readingKo: '키노-', meaningKo: '어제', romaji: 'kinou', category: 'daily' },
+  { word: 'あした', readingKo: '아시타', meaningKo: '내일', romaji: 'ashita', category: 'daily' },
+  { word: 'いま', readingKo: '이마', meaningKo: '지금', romaji: 'ima', category: 'daily' },
+  { word: 'まいにち', readingKo: '마이니치', meaningKo: '매일', romaji: 'mainichi', category: 'daily' },
+  { word: 'じかん', readingKo: '지칸', meaningKo: '시간', romaji: 'jikan', category: 'daily' },
+  { word: 'ごぜん', readingKo: '고젠', meaningKo: '오전', romaji: 'gozen', category: 'daily' },
+  { word: 'ごご', readingKo: '고고', meaningKo: '오후', romaji: 'gogo', category: 'daily' },
+  { word: 'ひと', readingKo: '히토', meaningKo: '사람', romaji: 'hito', category: 'daily' },
+  { word: 'ともだち', readingKo: '토모다치', meaningKo: '친구', romaji: 'tomodachi', category: 'daily' },
+  { word: 'こども', readingKo: '코도모', meaningKo: '아이', romaji: 'kodomo', category: 'daily' },
+  { word: 'おとこ', readingKo: '오토코', meaningKo: '남자', romaji: 'otoko', category: 'daily' },
+  { word: 'おんな', readingKo: '온나', meaningKo: '여자', romaji: 'onna', category: 'daily' },
+  { word: 'なまえ', readingKo: '나마에', meaningKo: '이름', romaji: 'namae', category: 'daily' },
+  { word: 'ことば', readingKo: '코토바', meaningKo: '말/언어', romaji: 'kotoba', category: 'daily' },
+  { word: 'くに', readingKo: '쿠니', meaningKo: '나라', romaji: 'kuni', category: 'daily' },
+  { word: 'まち', readingKo: '마치', meaningKo: '동네/거리', romaji: 'machi', category: 'daily' },
+  { word: 'みち', readingKo: '미치', meaningKo: '길', romaji: 'michi', category: 'daily' },
+  { word: 'えき', readingKo: '에키', meaningKo: '역', romaji: 'eki', category: 'daily' },
+  { word: 'みせ', readingKo: '미세', meaningKo: '가게', romaji: 'mise', category: 'daily' },
+  { word: 'かいしゃ', readingKo: '카이샤', meaningKo: '회사', romaji: 'kaisha', category: 'daily' },
+  { word: 'しごと', readingKo: '시고토', meaningKo: '일/직업', romaji: 'shigoto', category: 'daily' },
+  { word: 'やすみ', readingKo: '야스미', meaningKo: '휴식/휴일', romaji: 'yasumi', category: 'daily' },
+  { word: 'くるま', readingKo: '쿠루마', meaningKo: '자동차', romaji: 'kuruma', category: 'daily' },
+  { word: 'でんしゃ', readingKo: '덴샤', meaningKo: '전철/기차', romaji: 'densha', category: 'daily' },
+  { word: 'おかね', readingKo: '오카네', meaningKo: '돈', romaji: 'okane', category: 'daily' },
+  { word: 'くすり', readingKo: '쿠스리', meaningKo: '약', romaji: 'kusuri', category: 'daily' },
+  { word: 'いしゃ', readingKo: '이샤', meaningKo: '의사', romaji: 'isha', category: 'daily' },
+  { word: 'あさごはん', readingKo: '아사고한', meaningKo: '아침밥', romaji: 'asagohan', category: 'daily' },
+  { word: 'ひるごはん', readingKo: '히루고한', meaningKo: '점심밥', romaji: 'hirugohan', category: 'daily' },
+  { word: 'ばんごはん', readingKo: '방고한', meaningKo: '저녁밥', romaji: 'bangohan', category: 'daily' },
+  { word: 'たまご', readingKo: '타마고', meaningKo: '달걀', romaji: 'tamago', category: 'daily' },
+  { word: 'にく', readingKo: '니쿠', meaningKo: '고기', romaji: 'niku', category: 'daily' },
+  { word: 'さかな', readingKo: '사카나', meaningKo: '생선', romaji: 'sakana', category: 'daily' },
+  { word: 'やさい', readingKo: '야사이', meaningKo: '채소', romaji: 'yasai', category: 'daily' },
+  { word: 'くだもの', readingKo: '쿠다모노', meaningKo: '과일', romaji: 'kudamono', category: 'daily' },
+  { word: 'りんご', readingKo: '링고', meaningKo: '사과', romaji: 'ringo', category: 'daily' },
+  { word: 'みかん', readingKo: '미칸', meaningKo: '귤', romaji: 'mikan', category: 'daily' },
+  { word: 'かお', readingKo: '카오', meaningKo: '얼굴', romaji: 'kao', category: 'daily' },
+  { word: 'あたま', readingKo: '아타마', meaningKo: '머리', romaji: 'atama', category: 'daily' },
+  { word: 'からだ', readingKo: '카라다', meaningKo: '몸', romaji: 'karada', category: 'daily' },
+  { word: 'こころ', readingKo: '코코로', meaningKo: '마음', romaji: 'kokoro', category: 'daily' },
+  { word: 'ふく', readingKo: '후쿠', meaningKo: '옷', romaji: 'fuku', category: 'daily' },
+  { word: 'くつ', readingKo: '쿠츠', meaningKo: '신발', romaji: 'kutsu', category: 'daily' },
+  { word: 'べんきょう', readingKo: '벤쿄-', meaningKo: '공부', romaji: 'benkyou', category: 'daily' },
+  { word: 'かう', readingKo: '카우', meaningKo: '사다', romaji: 'kau', category: 'daily' },
+  { word: 'うる', readingKo: '우루', meaningKo: '팔다', romaji: 'uru', category: 'daily' },
+  { word: 'いく', readingKo: '이쿠', meaningKo: '가다', romaji: 'iku', category: 'daily' },
+  { word: 'くる', readingKo: '쿠루', meaningKo: '오다', romaji: 'kuru', category: 'daily' },
+  { word: 'かえる', readingKo: '카에루', meaningKo: '돌아가다', romaji: 'kaeru', category: 'daily' },
+  { word: 'はなす', readingKo: '하나스', meaningKo: '말하다', romaji: 'hanasu', category: 'daily' },
+  { word: 'よむ', readingKo: '요무', meaningKo: '읽다', romaji: 'yomu', category: 'daily' },
+  { word: 'かく', readingKo: '카쿠', meaningKo: '쓰다', romaji: 'kaku', category: 'daily' },
+  { word: 'のむ', readingKo: '노무', meaningKo: '마시다', romaji: 'nomu', category: 'daily' },
+  { word: 'おきる', readingKo: '오키루', meaningKo: '일어나다', romaji: 'okiru', category: 'daily' },
+  { word: 'はたらく', readingKo: '하타라쿠', meaningKo: '일하다', romaji: 'hataraku', category: 'daily' },
+  { word: 'やすむ', readingKo: '야스무', meaningKo: '쉬다', romaji: 'yasumu', category: 'daily' },
+  { word: 'つくる', readingKo: '츠쿠루', meaningKo: '만들다', romaji: 'tsukuru', category: 'daily' },
+  { word: 'つかう', readingKo: '츠카우', meaningKo: '사용하다', romaji: 'tsukau', category: 'daily' },
+  { word: 'まつ', readingKo: '마츠', meaningKo: '기다리다', romaji: 'matsu', category: 'daily' },
+  { word: 'あるく', readingKo: '아루쿠', meaningKo: '걷다', romaji: 'aruku', category: 'daily' },
+  { word: 'はしる', readingKo: '하시루', meaningKo: '달리다', romaji: 'hashiru', category: 'daily' },
+  { word: 'あつい', readingKo: '아츠이', meaningKo: '덥다/뜨겁다', romaji: 'atsui', category: 'daily' },
+  { word: 'さむい', readingKo: '사무이', meaningKo: '춥다', romaji: 'samui', category: 'daily' },
+  { word: 'あたらしい', readingKo: '아타라시-', meaningKo: '새롭다', romaji: 'atarashii', category: 'daily' },
+  { word: 'ふるい', readingKo: '후루이', meaningKo: '오래되다', romaji: 'furui', category: 'daily' },
+  { word: 'いい', readingKo: '이-', meaningKo: '좋다', romaji: 'ii', category: 'daily' },
+  { word: 'わるい', readingKo: '와루이', meaningKo: '나쁘다', romaji: 'warui', category: 'daily' },
+  { word: 'たかい', readingKo: '타카이', meaningKo: '비싸다/높다', romaji: 'takai', category: 'daily' },
+  { word: 'やすい', readingKo: '야스이', meaningKo: '싸다', romaji: 'yasui', category: 'daily' },
+  { word: 'おいしい', readingKo: '오이시-', meaningKo: '맛있다', romaji: 'oishii', category: 'daily' },
+  { word: 'こんにちは', readingKo: '콘니치와', meaningKo: '안녕하세요', romaji: 'konnichiwa', category: 'daily' },
+  { word: 'おはよう', readingKo: '오하요-', meaningKo: '좋은 아침', romaji: 'ohayou', category: 'daily' },
+  { word: 'こんばんは', readingKo: '콘방와', meaningKo: '안녕하세요/좋은 저녁', romaji: 'konbanwa', category: 'daily' },
+  { word: 'さようなら', readingKo: '사요-나라', meaningKo: '안녕히 가세요', romaji: 'sayounara', category: 'daily' },
+  { word: 'すみません', readingKo: '스미마센', meaningKo: '실례합니다/죄송합니다', romaji: 'sumimasen', category: 'daily' },
 ]
+
+const katakanaKanaCards = kanaCards.map(convertCardToKatakana)
+const katakanaWordCards = wordCards.map(convertCardToKatakana)
+const katakanaChartSections = convertChartSectionsToKatakana(hiraganaChartSections)
 
 const level = ref(1)
 const currentCard = ref(null)
@@ -217,6 +478,7 @@ const isAnswerVisible = ref(false)
 const isAnswered = ref(false)
 const isStarted = ref(false)
 const questionStartedAt = ref(null)
+const scriptMode = ref('hiragana')
 const currentView = ref('trainer')
 const recordMetric = ref('accuracy')
 const recordSortDirection = ref('desc')
@@ -225,18 +487,23 @@ const message = ref('')
 const resultState = ref('')
 const answerInput = ref('')
 const answerInputElement = ref(null)
+const isChartVisible = ref(false)
+const chartZoom = ref(1)
 const todayCount = ref(0)
 const correctCount = ref(0)
 const wrongCount = ref(0)
-const wrongCards = ref([])
+const wrongCards = ref({
+  hiragana: [],
+  katakana: [],
+})
 const cardStats = ref({})
 
 const activeCards = computed(() => {
   if (reviewMode.value) {
-    return wrongCards.value
+    return currentWrongCards.value
   }
 
-  return level.value === 1 ? kanaCards : wordCards
+  return level.value === 1 ? trainingKanaCards.value : trainingWordCards.value
 })
 
 const cardText = computed(() => {
@@ -244,11 +511,31 @@ const cardText = computed(() => {
   return currentCard.value.kana || currentCard.value.word
 })
 
-const levelLabel = computed(() => (level.value === 1 ? '히라가나 음 카드' : '일본어 단어 카드'))
+const scriptLabel = computed(() => (scriptMode.value === 'hiragana' ? '히라가나' : '가타카나'))
 
-const recordCards = computed(() => (level.value === 1 ? kanaCards : wordCards))
+const chartEyebrow = computed(() => (scriptMode.value === 'hiragana' ? 'Hiragana Chart' : 'Katakana Chart'))
+
+const chartButtonLabel = computed(() => `${scriptLabel.value} 보기`)
+
+const chartTitle = computed(() => `${scriptLabel.value} 전체 보기`)
+
+const currentChartSections = computed(() =>
+  scriptMode.value === 'hiragana' ? hiraganaChartSections : katakanaChartSections
+)
+
+const currentWrongCards = computed(() => wrongCards.value[scriptMode.value])
+
+const trainingKanaCards = computed(() => (scriptMode.value === 'hiragana' ? kanaCards : katakanaKanaCards))
+
+const trainingWordCards = computed(() => (scriptMode.value === 'hiragana' ? wordCards : katakanaWordCards))
+
+const levelLabel = computed(() => (level.value === 1 ? `${scriptLabel.value} 음 카드` : `${scriptLabel.value} 단어 카드`))
+
+const recordCards = computed(() => (level.value === 1 ? trainingKanaCards.value : trainingWordCards.value))
 
 const recordSortLabel = computed(() => (recordSortDirection.value === 'desc' ? '내림차순' : '오름차순'))
+
+const chartZoomPercent = computed(() => Math.round(chartZoom.value * 100))
 
 const cardStatRows = computed(() => {
   return recordCards.value
@@ -295,6 +582,42 @@ function getCardKey(card) {
   return card.kana || card.word
 }
 
+function toKatakanaText(text) {
+  return text.replace(/[ぁ-ゖ]/g, (character) =>
+    String.fromCharCode(character.charCodeAt(0) + 0x60)
+  )
+}
+
+function convertCardToKatakana(card) {
+  if (card.kana) {
+    return {
+      ...card,
+      kana: toKatakanaText(card.kana),
+    }
+  }
+
+  return {
+    ...card,
+    word: toKatakanaText(card.word),
+  }
+}
+
+function convertChartSectionsToKatakana(sections) {
+  return sections.map((section) => ({
+    ...section,
+    rows: section.rows.map((row) =>
+      row.map((item) =>
+        item
+          ? {
+              ...item,
+              kana: toKatakanaText(item.kana),
+            }
+          : null
+      )
+    ),
+  }))
+}
+
 function getStatKey(card) {
   return card.kana ? `kana:${card.kana}` : `word:${card.word}`
 }
@@ -319,6 +642,14 @@ function selectRecordMetric(nextMetric) {
 
   recordMetric.value = nextMetric
   recordSortDirection.value = 'desc'
+}
+
+function changeChartZoom(amount) {
+  chartZoom.value = Math.min(1.8, Math.max(0.85, Number((chartZoom.value + amount).toFixed(2))))
+}
+
+function resetChartZoom() {
+  chartZoom.value = 1
 }
 
 function recordCardResult(card, result, responseMs = 0) {
@@ -458,8 +789,8 @@ function countWrong(card, timeoutMessage) {
   isAnswered.value = true
   resultState.value = 'wrong'
 
-  if (!wrongCards.value.some((wrongCard) => getCardKey(wrongCard) === getCardKey(card))) {
-    wrongCards.value.push(card)
+  if (!currentWrongCards.value.some((wrongCard) => getCardKey(wrongCard) === getCardKey(card))) {
+    currentWrongCards.value.push(card)
   }
 
   message.value = timeoutMessage || '틀린 카드에 저장했습니다'
@@ -565,7 +896,7 @@ function markCorrect(responseMs = getElapsedResponseMs()) {
 }
 
 function startWrongReview() {
-  if (wrongCards.value.length === 0) {
+  if (currentWrongCards.value.length === 0) {
     message.value = '틀린 카드가 없습니다'
     return
   }
@@ -581,11 +912,7 @@ function returnToTraining() {
   nextCard()
 }
 
-function changeLevel(nextLevel) {
-  level.value = nextLevel
-}
-
-watch(level, () => {
+function resetTrainingState() {
   reviewMode.value = false
   isStarted.value = false
   currentCard.value = null
@@ -593,7 +920,23 @@ watch(level, () => {
   isAnswered.value = false
   answerInput.value = ''
   resultState.value = ''
+  message.value = ''
   questionStartedAt.value = null
+}
+
+function changeScriptMode(nextMode) {
+  if (scriptMode.value === nextMode) return
+
+  scriptMode.value = nextMode
+  resetTrainingState()
+}
+
+function changeLevel(nextLevel) {
+  level.value = nextLevel
+}
+
+watch(level, () => {
+  resetTrainingState()
 })
 
 onMounted(() => {
@@ -609,8 +952,29 @@ onUnmounted(() => {
   <main class="app-shell">
     <section class="trainer">
       <header class="header">
-        <p class="eyebrow">Hiragana Speed Trainer</p>
-        <h1>히라가나 반응속도 훈련</h1>
+        <div class="top-bar">
+          <p class="eyebrow">Japanese Reading</p>
+          <button class="chart-open-button" type="button" @click="isChartVisible = true">{{ chartButtonLabel }}</button>
+        </div>
+        <div class="title-row">
+          <h1>일본어 읽기 훈련</h1>
+          <div class="script-tabs" aria-label="문자 선택">
+            <button
+              :class="{ active: scriptMode === 'hiragana' }"
+              type="button"
+              @click="changeScriptMode('hiragana')"
+            >
+              히라가나
+            </button>
+            <button
+              :class="{ active: scriptMode === 'katakana' }"
+              type="button"
+              @click="changeScriptMode('katakana')"
+            >
+              가타카나
+            </button>
+          </div>
+        </div>
       </header>
 
       <div class="view-tabs" aria-label="화면 선택">
@@ -770,6 +1134,49 @@ onUnmounted(() => {
         </article>
       </section>
     </section>
+
+    <div class="chart-overlay" v-if="isChartVisible" @click.self="isChartVisible = false">
+      <section class="chart-dialog" :aria-label="`${scriptLabel} 전체 표`">
+        <header class="chart-header">
+          <div>
+            <p class="eyebrow">{{ chartEyebrow }}</p>
+            <h2>{{ chartTitle }}</h2>
+          </div>
+          <button class="chart-close-button" type="button" aria-label="닫기" @click="isChartVisible = false">
+            닫기
+          </button>
+        </header>
+
+        <div class="chart-controls" aria-label="표 확대 조절">
+          <button type="button" @click="changeChartZoom(-0.1)">축소</button>
+          <span>{{ chartZoomPercent }}%</span>
+          <button type="button" @click="changeChartZoom(0.1)">확대</button>
+          <button type="button" @click="resetChartZoom">초기화</button>
+        </div>
+
+        <div class="chart-scroll" :style="{ '--chart-zoom': chartZoom }">
+          <section class="chart-section" v-for="section in currentChartSections" :key="section.title">
+            <h3>{{ section.title }}</h3>
+            <div class="kana-chart" :class="{ compact: section.title === '요음' }">
+              <template v-for="(row, rowIndex) in section.rows" :key="`${section.title}-${rowIndex}`">
+                <div
+                  class="kana-cell"
+                  v-for="(item, itemIndex) in row"
+                  :key="`${section.title}-${rowIndex}-${itemIndex}`"
+                  :class="{ empty: !item }"
+                >
+                  <template v-if="item">
+                    <strong>{{ item.kana }}</strong>
+                    <span>{{ item.romaji }}</span>
+                    <em>{{ item.readingKo }}</em>
+                  </template>
+                </div>
+              </template>
+            </div>
+          </section>
+        </div>
+      </section>
+    </div>
   </main>
 </template>
 
@@ -825,8 +1232,16 @@ button:active {
   text-align: center;
 }
 
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
 .eyebrow {
-  margin: 0 0 6px;
+  margin: 0;
   color: #5d6875;
   font-size: 0.82rem;
   font-weight: 800;
@@ -834,10 +1249,58 @@ button:active {
   text-transform: uppercase;
 }
 
+.chart-open-button,
+.chart-close-button {
+  min-height: 36px;
+  padding: 0 12px;
+  color: #1d2733;
+  background: #dce5e9;
+  font-size: 0.9rem;
+}
+
+.chart-open-button:hover,
+.chart-close-button:hover {
+  background: #cbd8df;
+}
+
 h1 {
   margin: 0;
   font-size: 2rem;
   letter-spacing: 0;
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.script-tabs {
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 4px;
+  border-radius: 8px;
+  background: #dce5e9;
+}
+
+.script-tabs button {
+  min-height: 34px;
+  padding: 0 10px;
+  color: #1d2733;
+  background: transparent;
+  font-size: 0.88rem;
+}
+
+.script-tabs button:hover {
+  background: #cbd8df;
+}
+
+.script-tabs button.active {
+  color: #fff;
+  background: #28666e;
 }
 
 .view-tabs,
@@ -1169,6 +1632,128 @@ h1 {
   font-size: 1.2rem;
 }
 
+.chart-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgb(29 39 51 / 54%);
+}
+
+.chart-dialog {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  width: min(100%, 920px);
+  max-height: min(92vh, 860px);
+  overflow: hidden;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 24px 60px rgb(29 39 51 / 28%);
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px;
+  border-bottom: 1px solid #e0e6eb;
+}
+
+.chart-header h2 {
+  margin: 4px 0 0;
+  font-size: 1.45rem;
+}
+
+.chart-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-bottom: 1px solid #e0e6eb;
+  background: #f8fafb;
+}
+
+.chart-controls button {
+  min-height: 36px;
+  padding: 0 12px;
+  background: #28666e;
+}
+
+.chart-controls span {
+  min-width: 56px;
+  color: #28666e;
+  font-weight: 900;
+  text-align: center;
+}
+
+.chart-scroll {
+  overflow: auto;
+  padding: 18px;
+}
+
+.chart-section + .chart-section {
+  margin-top: 24px;
+}
+
+.chart-section h3 {
+  margin: 0 0 10px;
+  color: #1d2733;
+  font-size: 1.1rem;
+}
+
+.kana-chart {
+  display: grid;
+  grid-template-columns: repeat(5, calc(104px * var(--chart-zoom)));
+  gap: calc(8px * var(--chart-zoom));
+  width: max-content;
+}
+
+.kana-chart.compact {
+  grid-template-columns: repeat(3, calc(124px * var(--chart-zoom)));
+}
+
+.kana-cell {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  min-height: calc(96px * var(--chart-zoom));
+  padding: calc(10px * var(--chart-zoom));
+  border: 1px solid #d9e1e7;
+  border-radius: 8px;
+  background: #f8fafb;
+  text-align: center;
+}
+
+.kana-cell.empty {
+  border-style: dashed;
+  background: #eef2f5;
+}
+
+.kana-cell strong {
+  color: #1d2733;
+  font-size: calc(2.15rem * var(--chart-zoom));
+  line-height: 1;
+}
+
+.kana-cell span {
+  margin-top: calc(7px * var(--chart-zoom));
+  color: #28666e;
+  font-size: calc(0.9rem * var(--chart-zoom));
+  font-weight: 900;
+}
+
+.kana-cell em {
+  margin-top: calc(3px * var(--chart-zoom));
+  color: #667381;
+  font-size: calc(0.84rem * var(--chart-zoom));
+  font-style: normal;
+  font-weight: 800;
+}
+
 @media (max-width: 430px) {
   .app-shell {
     display: block;
@@ -1182,6 +1767,56 @@ h1 {
 
   h1 {
     font-size: 1.55rem;
+  }
+
+  .top-bar {
+    align-items: flex-start;
+  }
+
+  .title-row {
+    align-items: stretch;
+    justify-content: center;
+  }
+
+  .script-tabs {
+    width: min(100%, 220px);
+  }
+
+  .chart-overlay {
+    align-items: stretch;
+    padding: 10px;
+  }
+
+  .chart-dialog {
+    max-height: calc(100dvh - 20px);
+  }
+
+  .chart-header {
+    padding: 14px;
+  }
+
+  .chart-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .chart-controls {
+    padding: 10px 14px;
+  }
+
+  .chart-scroll {
+    padding: 14px;
+  }
+
+  .kana-chart {
+    grid-template-columns: repeat(5, calc(82px * var(--chart-zoom)));
+  }
+
+  .kana-chart.compact {
+    grid-template-columns: repeat(3, calc(96px * var(--chart-zoom)));
+  }
+
+  .kana-cell {
+    min-height: calc(78px * var(--chart-zoom));
   }
 
   .card {
