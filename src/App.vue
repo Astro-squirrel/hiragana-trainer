@@ -1903,6 +1903,7 @@ h1 {
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);
   width: min(100%, 1020px);
+  height: min(92vh, 860px);
   max-height: min(92vh, 860px);
   overflow: hidden;
   border-radius: 8px;
@@ -2189,6 +2190,7 @@ h1 {
   }
 
   .vocabulary-dialog {
+    height: calc(100dvh - 20px);
     max-height: calc(100dvh - 20px);
   }
 
