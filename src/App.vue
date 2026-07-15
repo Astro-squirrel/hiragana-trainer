@@ -592,8 +592,8 @@ const todayCount = ref(0)
 const correctCount = ref(0)
 const wrongCount = ref(0)
 const wrongCards = ref({
-  hiragana: [],
-  katakana: [],
+  hiragana: { 1: [], 2: [], 3: [] },
+  katakana: { 1: [], 2: [], 3: [] },
 })
 const cardStats = ref({})
 
@@ -602,7 +602,7 @@ const activeCards = computed(() => {
     return currentWrongCards.value
   }
 
-  return level.value === 1 ? trainingKanaCards.value : trainingWordCards.value
+  return levelCards.value
 })
 
 const cardText = computed(() => {
@@ -628,15 +628,25 @@ const currentChartSections = computed(() =>
   chartView.value === 'katakana' ? katakanaChartSections : hiraganaChartSections
 )
 
-const currentWrongCards = computed(() => wrongCards.value[scriptMode.value])
+const currentWrongCards = computed(() => wrongCards.value[scriptMode.value][level.value])
 
 const trainingKanaCards = computed(() => (scriptMode.value === 'hiragana' ? kanaCards : katakanaKanaCards))
 
 const trainingWordCards = computed(() => (scriptMode.value === 'hiragana' ? wordCards : katakanaWordCards))
 
-const levelLabel = computed(() => (level.value === 1 ? `${scriptLabel.value} 음 카드` : `${scriptLabel.value} 단어 카드`))
+const levelCards = computed(() => {
+  if (level.value === 1) return trainingKanaCards.value.slice(0, 46)
+  if (level.value === 2) return trainingKanaCards.value
+  return trainingWordCards.value
+})
 
-const recordCards = computed(() => (level.value === 1 ? trainingKanaCards.value : trainingWordCards.value))
+const levelLabel = computed(() => {
+  if (level.value === 1) return `${scriptLabel.value} 기본음 카드`
+  if (level.value === 2) return `${scriptLabel.value} 전체 음절 카드`
+  return `${scriptLabel.value} 단어 카드`
+})
+
+const recordCards = computed(() => levelCards.value)
 
 const vocabularyCards = computed(() => {
   const query = vocabularyQuery.value.trim().toLowerCase()
@@ -1133,6 +1143,9 @@ onUnmounted(() => {
           <button :class="{ active: level === 2 }" type="button" @click="changeLevel(2)">
           난이도 2
           </button>
+          <button :class="{ active: level === 3 }" type="button" @click="changeLevel(3)">
+          난이도 3
+          </button>
         </div>
 
         <p class="level-label">{{ levelLabel }}</p>
@@ -1220,12 +1233,12 @@ onUnmounted(() => {
               <h2>
                 {{
                   recordMetric === 'accuracy'
-                    ? level === 1
-                      ? '음절별 정답률'
-                      : '단어별 정답률'
-                    : level === 1
-                      ? '음절별 응답속도'
-                      : '단어별 응답속도'
+                    ? level === 3
+                      ? '단어별 정답률'
+                      : '음절별 정답률'
+                    : level === 3
+                      ? '단어별 응답속도'
+                      : '음절별 응답속도'
                 }}
               </h2>
             </div>
@@ -1563,6 +1576,7 @@ h1 {
 }
 
 .level-tabs {
+  grid-template-columns: repeat(3, 1fr);
   margin-bottom: 10px;
 }
 
