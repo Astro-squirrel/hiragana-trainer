@@ -637,11 +637,19 @@ const uniqueWordCards = Array.from(
 wordCards.splice(0, wordCards.length, ...uniqueWordCards)
 
 const katakanaKanaCards = kanaCards.map(convertCardToKatakana)
+const katakanaLoanwordReadings = new Set([
+  'どあ', 'べっど', 'てれび', 'ぱそこん', 'たおる', 'しゃんぷー', 'ばす', 'たくしー', 'こんびに', 'すーぱー', 'れすとらん', 'ほてる',
+  'こーひー', 'じゅーす', 'ぱん', 'すーぷ', 'さらだ', 'らーめん', 'にゅーす', 'げーむ', 'いんたーねっと', 'めーる', 'めも', 'れじ',
+  'のーと', 'かれんだー', 'ぷれぜんと', 'びざ', 'ばーげん', 'さいず', 'れじぶくろ', 'ぽいんと', 'くれじっとかーど', 'ぱすわーど', 'きっちん',
+  'といれ', 'こっぷ', 'ふらいぱん', 'れしぴ', 'あいすくりーむ', 'けーき', 'ちょこれーと', 'びーる', 'わいん', 'かれー',
+])
+const hiraganaWordCards = wordCards.filter((card) => !katakanaLoanwordReadings.has(card.word))
 const katakanaOnlyWordCards = [
   { word: 'エレベーター', readingKo: '에레베-타-', meaningKo: '엘리베이터', romaji: 'erebeetaa', category: 'loanword' },
   { word: 'エスカレーター', readingKo: '에스카레-타-', meaningKo: '에스컬레이터', romaji: 'esukareetaa', category: 'loanword' },
 ]
 const katakanaWordCards = [...wordCards.map(convertCardToKatakana), ...katakanaOnlyWordCards]
+const allVocabularyCards = [...wordCards, ...katakanaOnlyWordCards]
 const katakanaChartSections = convertChartSectionsToKatakana(hiraganaChartSections)
 const combinedChartSections = hiraganaChartSections.map((section, sectionIndex) => ({
   ...section,
@@ -727,7 +735,7 @@ const currentWrongCards = computed(() => wrongCards.value[scriptMode.value][leve
 
 const trainingKanaCards = computed(() => (scriptMode.value === 'hiragana' ? kanaCards : katakanaKanaCards))
 
-const trainingWordCards = computed(() => (scriptMode.value === 'hiragana' ? wordCards : katakanaWordCards))
+const trainingWordCards = computed(() => (scriptMode.value === 'hiragana' ? hiraganaWordCards : katakanaWordCards))
 
 const levelCards = computed(() => {
   if (level.value === 1) return trainingKanaCards.value.slice(0, 46)
@@ -746,9 +754,9 @@ const recordCards = computed(() => levelCards.value)
 const vocabularyCards = computed(() => {
   const query = vocabularyQuery.value.trim().toLowerCase()
 
-  if (!query) return wordCards
+  if (!query) return allVocabularyCards
 
-  return wordCards.filter((card) =>
+  return allVocabularyCards.filter((card) =>
     [card.word, toKatakanaText(card.word), card.readingKo, card.meaningKo, card.romaji].some((value) =>
       value.toLowerCase().includes(query)
     )
@@ -812,6 +820,14 @@ function toKatakanaText(text) {
   return text.replace(/[ぁ-ゖ]/g, (character) =>
     String.fromCharCode(character.charCodeAt(0) + 0x60)
   )
+}
+
+function getHiraganaVocabularyText(card) {
+  return katakanaLoanwordReadings.has(card.word) || /[ァ-ヺ]/.test(card.word) ? '—' : card.word
+}
+
+function getKatakanaVocabularyText(card) {
+  return toKatakanaText(card.word)
 }
 
 function convertCardToKatakana(card) {
@@ -1496,7 +1512,7 @@ onUnmounted(() => {
             <button type="button" :class="{ active: vocabularyVisibleColumns.reading }" :aria-pressed="vocabularyVisibleColumns.reading" @click="toggleVocabularyColumn('reading')">발음</button>
             <button type="button" :class="{ active: vocabularyVisibleColumns.meaning }" :aria-pressed="vocabularyVisibleColumns.meaning" @click="toggleVocabularyColumn('meaning')">뜻</button>
           </div>
-          <strong>{{ vocabularyCards.length }} / {{ wordCards.length }}개</strong>
+          <strong>{{ vocabularyCards.length }} / {{ allVocabularyCards.length }}개</strong>
         </div>
 
         <div class="vocabulary-table-wrap">
@@ -1511,8 +1527,8 @@ onUnmounted(() => {
             </thead>
             <tbody>
               <tr v-for="card in vocabularyCards" :key="card.word">
-                <td v-if="vocabularyVisibleColumns.hiragana" class="vocabulary-kana">{{ card.word }}</td>
-                <td v-if="vocabularyVisibleColumns.katakana" class="vocabulary-kana">{{ toKatakanaText(card.word) }}</td>
+                <td v-if="vocabularyVisibleColumns.hiragana" class="vocabulary-kana">{{ getHiraganaVocabularyText(card) }}</td>
+                <td v-if="vocabularyVisibleColumns.katakana" class="vocabulary-kana">{{ getKatakanaVocabularyText(card) }}</td>
                 <td v-if="vocabularyVisibleColumns.reading">{{ card.readingKo }}</td>
                 <td v-if="vocabularyVisibleColumns.meaning">{{ card.meaningKo }}</td>
               </tr>
