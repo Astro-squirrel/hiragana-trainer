@@ -1,0 +1,24 @@
+{
+  "name": "일본어 읽기 훈련",
+  "short_name": "일본어 읽기",
+  "description": "히라가나와 가타카나를 읽고 발음을 연습하는 학습 도구",
+  "lang": "ko",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#eef2f5",
+  "theme_color": "#28666e",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
