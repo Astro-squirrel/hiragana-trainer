@@ -573,7 +573,7 @@ const recommendedWordData = [
   ['れじぶくろ', '레지부쿠로', '비닐봉지', 'rejibukuro'], ['ぽいんと', '포인트', '포인트', 'pointo'], ['くれじっとかーど', '쿠레짓토카-도', '신용카드', 'kurejittokaado'], ['ぱすわーど', '파스와-도', '비밀번호', 'pasuwaado'],
   ['せいひん', '세-힌', '제품', 'seihin'], ['きかい', '키카이', '기계/기회', 'kikai'], ['こしょう', '코쇼-', '고장', 'koshou'], ['しゅうり', '슈-리', '수리', 'shuuri'],
   ['せいそう', '세-소-', '청소', 'seisou'], ['せんたく', '센타쿠', '세탁', 'sentaku'], ['せいり', '세-리', '정리', 'seiri'], ['せいとん', '세-톤', '정돈', 'seiton'],
-  ['ちゅうしゃじょう', '츄-샤죠-', '주차장', 'chuushajou'], ['えれべーたー', '에레베-타-', '엘리베이터', 'erebeetaa'], ['えすかれーたー', '에스카레-타-', '에스컬레이터', 'esukareetaa'], ['かいだん', '카이단', '계단', 'kaidan'],
+  ['ちゅうしゃじょう', '츄-샤죠-', '주차장', 'chuushajou'], ['かいだん', '카이단', '계단', 'kaidan'],
   ['きっちん', '킷친', '주방', 'kitchin'], ['といれ', '토이레', '화장실', 'toire'], ['おふろ', '오후로', '목욕탕', 'ofuro'], ['だいどころ', '다이도코로', '부엌', 'daidokoro'],
   ['わん', '완', '공기/그릇', 'wan'], ['はし', '하시', '젓가락', 'hashi'], ['こっぷ', '콧푸', '컵', 'koppu'], ['さら', '사라', '접시', 'sara'],
   ['なべ', '나베', '냄비', 'nabe'], ['ふらいぱん', '후라이팡', '프라이팬', 'furaipan'], ['ほうちょう', '호-초-', '식칼', 'houchou'], ['れしぴ', '레시피', '요리법', 'reshipi'],
@@ -606,14 +606,42 @@ const recommendedWordCards = (() => {
   }).slice(0, 200)
 })()
 
+const foundationalWordCards = [
+  ['いち', '이치', '1', 'ichi'], ['に', '니', '2', 'ni'], ['さん', '산', '3', 'san'], ['よん', '욘', '4', 'yon'], ['ご', '고', '5', 'go'],
+  ['ろく', '로쿠', '6', 'roku'], ['なな', '나나', '7', 'nana'], ['はち', '하치', '8', 'hachi'], ['きゅう', '큐-', '9', 'kyuu'], ['じゅう', '주-', '10', 'juu'],
+  ['ひとつ', '히토츠', '하나', 'hitotsu'], ['ふたつ', '후타츠', '둘', 'futatsu'], ['みっつ', '밋츠', '셋', 'mittsu'], ['よっつ', '욧츠', '넷', 'yottsu'],
+  ['いつつ', '이츠츠', '다섯', 'itsutsu'], ['むっつ', '뭇츠', '여섯', 'muttsu'], ['ななつ', '나나츠', '일곱', 'nanatsu'], ['やっつ', '얏츠', '여덟', 'yattsu'],
+  ['ここのつ', '코코노츠', '아홉', 'kokonotsu'], ['とお', '토-', '열', 'too'], ['れい', '레이', '영', 'rei'], ['なんばん', '난방', '몇 번', 'nanban'],
+  ['あか', '아카', '빨강', 'aka'], ['あお', '아오', '파랑', 'ao'], ['きいろ', '키이로', '노랑', 'kiiro'], ['みどり', '미도리', '초록', 'midori'],
+  ['くろ', '쿠로', '검정', 'kuro'], ['しろ', '시로', '하양', 'shiro'], ['ちゃいろ', '차이로', '갈색', 'chairo'], ['むらさき', '무라사키', '보라색', 'murasaki'],
+  ['みぎ', '미기', '오른쪽', 'migi'], ['ひだり', '히다리', '왼쪽', 'hidari'], ['まえ', '마에', '앞', 'mae'], ['うしろ', '우시로', '뒤', 'ushiro'],
+  ['なか', '나카', '안/가운데', 'naka'], ['そと', '소토', '밖', 'soto'], ['うえ', '우에', '위', 'ue'], ['した', '시타', '아래', 'shita'],
+  ['だれ', '다레', '누구', 'dare'], ['なに', '나니', '무엇', 'nani'], ['どこ', '도코', '어디', 'doko'], ['どれ', '도레', '어느 것', 'dore'],
+  ['いつ', '이츠', '언제', 'itsu'], ['どうして', '도-시테', '왜', 'doushite'], ['どうやって', '도-얏테', '어떻게', 'douyatte'], ['どんな', '돈나', '어떤', 'donna'],
+  ['はい', '하이', '네', 'hai'], ['いいえ', '이이에', '아니요', 'iie'], ['また', '마타', '또/다시', 'mata'], ['まだ', '마다', '아직', 'mada'],
+].map(([word, readingKo, meaningKo, romaji]) => ({ word, readingKo, meaningKo, romaji, category: 'foundational' }))
+
+const uniqueFoundationalWordCards = (() => {
+  const usedWords = new Set([...wordCards, ...additionalDailyWords, ...additionalVerbCards, ...finalDailyWords, ...recommendedWordCards].map((card) => card.word))
+  return foundationalWordCards.filter((card) => {
+    if (usedWords.has(card.word)) return false
+    usedWords.add(card.word)
+    return true
+  })
+})()
+
 const uniqueWordCards = Array.from(
-  new Map([...wordCards, ...additionalDailyWords, ...additionalVerbCards, ...finalDailyWords, ...recommendedWordCards].map((card) => [card.word, card])).values()
+  new Map([...wordCards, ...additionalDailyWords, ...additionalVerbCards, ...finalDailyWords, ...recommendedWordCards, ...uniqueFoundationalWordCards].map((card) => [card.word, card])).values()
 )
 
 wordCards.splice(0, wordCards.length, ...uniqueWordCards)
 
 const katakanaKanaCards = kanaCards.map(convertCardToKatakana)
-const katakanaWordCards = wordCards.map(convertCardToKatakana)
+const katakanaOnlyWordCards = [
+  { word: 'エレベーター', readingKo: '에레베-타-', meaningKo: '엘리베이터', romaji: 'erebeetaa', category: 'loanword' },
+  { word: 'エスカレーター', readingKo: '에스카레-타-', meaningKo: '에스컬레이터', romaji: 'esukareetaa', category: 'loanword' },
+]
+const katakanaWordCards = [...wordCards.map(convertCardToKatakana), ...katakanaOnlyWordCards]
 const katakanaChartSections = convertChartSectionsToKatakana(hiraganaChartSections)
 const combinedChartSections = hiraganaChartSections.map((section, sectionIndex) => ({
   ...section,
